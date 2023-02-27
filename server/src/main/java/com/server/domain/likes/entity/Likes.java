@@ -1,4 +1,4 @@
-package com.server.domain.like.entity;
+package com.server.domain.likes.entity;
 
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.member.entity.Member;
@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Like {
+public class Likes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
