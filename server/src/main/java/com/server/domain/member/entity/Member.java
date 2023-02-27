@@ -41,9 +41,4 @@ public class Member extends Auditable {
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
 
-    @OneToMany(mappedBy = "blog")
-    public List<Blog> blogs = new ArrayList<>();
-
-
-
 }
