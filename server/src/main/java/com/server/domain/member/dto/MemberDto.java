@@ -1,11 +1,15 @@
 package com.server.domain.member.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class MemberDto {
 
+    @Getter
     public static class Post {
         @NotBlank
         @Email
@@ -14,10 +18,11 @@ public class MemberDto {
         @NotBlank
         private String nickName;
 
-        @NotNull
+        @NotBlank
         private String password;
     }
 
+    @Getter
     public static class Patch {
         // 이미지 URL
         @NotBlank

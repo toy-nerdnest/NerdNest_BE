@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Member extends Auditable {
@@ -26,11 +27,9 @@ public class Member extends Auditable {
     private String password;
 
     @Column(nullable = false, unique = true)
-    @Setter
     private String nickName;
 
     @Column
-    @Setter
     private String about;
 
     @ElementCollection(fetch = FetchType.EAGER)

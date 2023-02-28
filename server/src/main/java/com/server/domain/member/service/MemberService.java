@@ -4,7 +4,9 @@ import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
+import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,14 +15,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MemberAuthorityUtils authorityUtils;
+    private final PasswordEncoder passwordEncoder;
 
     // 회원 생성
     public Member createMember(Member member) {
         // 이메일 중복 확인
         verifyExistEmail(member.getEmail());
-        // 멤버 리포지토리에 저장
+
+        String encryptedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encryptedPassword);
+        member.setRoles(authorityUtils.createRole());
+
         Member saveMember = memberRepository.save(member);
-        // 저장한 값 반환
+
         return saveMember;
     }
     // 회원 정보 수정
