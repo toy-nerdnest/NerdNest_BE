@@ -54,8 +54,8 @@ jobs:
         echo "DB_URL=$DB_URL" >> src/main/resources/env.yml
         echo "DB_USERNAME=$DB_USERNAME" >> src/main/resources/env.yml
         echo "DB_PASSWORD=$DB_PASSWORD" >> src/main/resources/env.yml
-        echo "S3_ACCESSKEY=$AWS_ACCESS_KEY" >> src/main/resources/env.yml
-        echo "S3_SECRETKEY=$AWS_SECRET_ACCESS_KEY" >> src/main/resources/env.yml
+        echo "S3_ACCESSKEY=$S3_ACCESSKEY" >> src/main/resources/env.yml
+        echo "S3_SECRETKEY=$S3_SECRETKEY" >> src/main/resources/env.yml
         echo "S3_BUCKET=$S3_BUCKET" >> src/main/resources/env.yml
         echo "S3_REGION=$S3_REGION" >> src/main/resources/env.yml
         
