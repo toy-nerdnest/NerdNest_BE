@@ -58,13 +58,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         //token response body에 넣기
         Map<String, Object> responseBody = new LinkedHashMap<>();
-        responseBody.put("access_token", "Bearer " + accessToken);
-        responseBody.put("refresh_token", refreshToken);
+        responseBody.put("memberId", member.getMemberId());
+        responseBody.put("accessToken", "Bearer " + accessToken);
+        responseBody.put("refreshToken", refreshToken);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         new ObjectMapper().writeValue(response.getOutputStream(), responseBody);
+
+        this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
     }
 
     // accessToken 생성 로직

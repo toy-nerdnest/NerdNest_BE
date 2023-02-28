@@ -1,5 +1,7 @@
 package com.server.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -85,5 +87,14 @@ public class JwtTokenizer {
         Date expiration = calendar.getTime();
 
         return expiration;
+    }
+
+    // jwt 검증을 위해 claims 파싱
+    public Jws<Claims> getClaims(String jws, String base64EncodedSecretKey) {
+        Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
+
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build().parseClaimsJws(jws);
     }
 }
