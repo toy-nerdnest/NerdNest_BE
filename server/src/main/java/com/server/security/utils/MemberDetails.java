@@ -1,6 +1,7 @@
 package com.server.security.utils;
 
 import com.server.domain.member.entity.Member;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -10,8 +11,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 
+@Getter
 public class MemberDetails extends Member implements UserDetails {
-    private final MemberAuthorityUtils authorityUtils;
+    private MemberAuthorityUtils authorityUtils;
 
     public MemberDetails(MemberAuthorityUtils authorityUtils, Member member) {
         this.authorityUtils = authorityUtils;

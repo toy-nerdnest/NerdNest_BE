@@ -59,7 +59,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
     }
     // 인증된 정보를 security context에 저장
     private void setAuthenticationToContext(Map<String, Object> claims) {
-        long memberId = (long) claims.get("memberId");
+        long memberId = Long.parseLong(String.valueOf(claims.get("memberId")));
         String email = (String) claims.get("email");
         List<String> roles = (List<String>) claims.get("roles");
 

@@ -25,6 +25,7 @@ public class MemberDto {
     }
 
     @Getter
+    @Builder
     public static class Patch {
         // 이미지 URL
         @NotBlank
@@ -32,7 +33,8 @@ public class MemberDto {
         @NotNull
         private String about;
     }
-
+    @Getter
+    @Builder
     public static class Response {
         // 이미지 URL
         private String nickName;

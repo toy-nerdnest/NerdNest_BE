@@ -5,9 +5,13 @@ import com.server.domain.member.entity.Member;
 import com.server.domain.member.mapper.MemberMapper;
 import com.server.domain.member.service.MemberService;
 import com.server.response.SingleResponseDto;
+import com.server.security.utils.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,6 +23,7 @@ import java.net.URI;
 @RequestMapping
 @Valid
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final MemberMapper mapper;
@@ -40,7 +45,13 @@ public class MemberController {
     // 내 정보 수정하기 -> patch, 권한 필요
     @PatchMapping("/members/{member-id}")
     public ResponseEntity patchMemberImage(@Positive @PathVariable("member-id") long memberId,
-                                           @Valid @RequestBody MemberDto.Patch memberPatchDto) {
+                                           @Valid @RequestBody MemberDto.Patch memberPatchDto,
+                                           @AuthenticationPrincipal Member loginMember) {
+        if(loginMember == null) {
+            log.error("허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Member member = memberService.updateMember(memberId, mapper.memberPatchDtoToMember(memberPatchDto));
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);
 
@@ -58,7 +69,13 @@ public class MemberController {
 
     // 내 정보 가져오기-> get, 권한 필요
     @GetMapping("/members/{member-id}")
-    public ResponseEntity getMemberImage(@Positive @PathVariable("member-id") long memberId) {
+    public ResponseEntity getMemberImage(@Positive @PathVariable("member-id") long memberId,
+                                         @AuthenticationPrincipal Member loginMember) {
+        if(loginMember == null) {
+            log.error("허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Member member = memberService.findMember(memberId);
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);
 
