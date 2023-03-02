@@ -1,5 +1,7 @@
 package com.server.security;
 
+import com.server.exception.BusinessLogicException;
+import com.server.exception.ExceptionCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -8,13 +10,20 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -96,5 +105,24 @@ public class JwtTokenizer {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build().parseClaimsJws(jws);
+    }
+
+    // jwt 만료 검증, true -> 만료 x, false -> 만료 O
+    public boolean validateToken(String jwt) {
+        return this.getClaims(jwt, encodeBase64SecretKey(secretKey)) != null;
+    }
+
+    // 남은 유효 기간 산정
+    public long getExpiration(String token) {
+        Key key = getKeyFromBase64EncodedKey(encodeBase64SecretKey(secretKey));
+
+        Date expiration = Jwts
+                .parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody().getExpiration();
+
+        return expiration.getTime() - new Date().getTime();
     }
 }

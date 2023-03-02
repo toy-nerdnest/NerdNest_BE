@@ -50,6 +50,9 @@ public class MemberController {
         if(loginMember == null) {
             log.error("허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } else if(loginMember.getMemberId() != memberId) {
+            log.error("수정할 memberId : {}, 로그인한 membmerId :{}", memberId, loginMember.getMemberId());
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         Member member = memberService.updateMember(memberId, mapper.memberPatchDtoToMember(memberPatchDto));
@@ -67,14 +70,10 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 내 정보 가져오기-> get, 권한 필요
+    // 회원 정보 가져오기
     @GetMapping("/members/{member-id}")
-    public ResponseEntity getMemberImage(@Positive @PathVariable("member-id") long memberId,
-                                         @AuthenticationPrincipal Member loginMember) {
-        if(loginMember == null) {
-            log.error("허용되지 않은 접근입니다.");
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity getMemberImage(@Positive @PathVariable("member-id") long memberId) {
+
 
         Member member = memberService.findMember(memberId);
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);

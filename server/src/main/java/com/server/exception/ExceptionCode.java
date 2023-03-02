@@ -14,11 +14,15 @@ public enum ExceptionCode {
     // Blog
     BLOG_NOT_FOUND(404, "Blog Not Found"),
 
-
     // Category
     CATEGORY_NOT_FOUND(404, "Category Not Found"),
     CATEGORY_ID_NOT_ALLOWED(405, "CategoryId Not Allowed"),
-    CATEGORY_EXISTS(409, "Category Exists");
+    CATEGORY_EXISTS(409, "Category Exists"),
+
+    // token
+    ACCESS_TOKEN_EXPIRATION(401, "Access Token Expiration"),
+    REFRESH_TOKEN_EXPIRATION(401, "Refresh Token Expiration"),
+    INVALID_TOKEN(400, "Invalid token");
 
     @Getter
     private int status;
