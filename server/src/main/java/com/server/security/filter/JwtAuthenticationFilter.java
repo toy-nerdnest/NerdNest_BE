@@ -4,9 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.domain.member.entity.Member;
 import com.server.security.JwtTokenizer;
 import com.server.security.dto.LoginDto;
+import com.server.security.service.AuthService;
+import com.server.security.service.RedisService;
 import com.server.security.utils.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,16 +24,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenizer jwtTokenizer;
+    private final RedisService redisService;
+    private final AuthService authService;
 
     // login 요청 시, 인증을 시도하는 로직
     @SneakyThrows
@@ -53,9 +58,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         MemberDetails member = (MemberDetails) authResult.getPrincipal();
 
-        String accessToken = delegateAccessToken(member);
-        String refreshToken = delegateRefreshToken(member);
+        String accessToken = authService.delegateAccessToken(member);
+        String refreshToken = authService.delegateRefreshToken(member);
 
+        // todo 생성된 refreshToken redis에 저장해야 함.
+        if(redisService.getRefreshToken(member.getEmail())==null) {
+            redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
+            log.info("save Refresh Token in redis server!");
+        }
         //token response body에 넣기
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("memberId", member.getMemberId());
@@ -70,31 +80,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
     }
 
-    // accessToken 생성 로직
-    private String delegateAccessToken(MemberDetails member) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("memberId", member.getMemberId());
-        claims.put("email",member.getEmail());
-        claims.put("nickname",member.getNickName());
-        claims.put("roles", member.getRoles());
 
-        String subject = member.getEmail();
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
-
-        return accessToken;
-    }
-
-    // refreshToken 생성 로직
-    private String delegateRefreshToken(MemberDetails member) {
-        String subject = member.getEmail();
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
-
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
-
-        return refreshToken;
-    }
 }
