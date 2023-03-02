@@ -1,9 +1,11 @@
 package com.server.domain.category.service;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.repository.CategoryRepository;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
+import com.server.utils.CustomBeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+
+    private final CustomBeanUtils beanUtils;
 
     public void makeSingleCategory(Category category) {
         verifyCategoryNameExistence(category);
@@ -31,9 +35,7 @@ public class CategoryService {
 
     public void editSingleCategory(Category category) {
         Category singleCategory = findSingleCategory(category.getCategoryId());
-
-        Optional.ofNullable(category.getCategoryName())
-                .ifPresent(singleCategory::setCategoryName);
+        beanUtils.copyNonNullProperties(category, singleCategory);
 
         categoryRepository.save(singleCategory);
     }

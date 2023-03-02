@@ -1,6 +1,7 @@
 package com.server.domain.blog.controller;
 
 import com.server.domain.blog.dto.BlogDto;
+import com.server.domain.blog.dto.BlogResponseDto;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.mapper.BlogMapper;
 import com.server.domain.blog.service.BlogService;
@@ -15,43 +16,51 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
+@Slf4j
+@Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
-@Validated
-@Slf4j
+@RequestMapping("/blogs")
 public class BlogController {
-
     private final BlogService blogService;
     private final BlogMapper mapper;
+    private final CategoryService categoryService;
 
-    @PostMapping("/blogs")
-    public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
-                                   @RequestParam(defaultValue = "1", required = false) int categoryId) {
-        //TODO: Category & Member 추가예정
-        blogPostDto.setCategoryId(categoryId);
-        Blog blog = mapper.blogPostDtoToBlog(blogPostDto);
+    @PostMapping
+    public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto) {
+        //TODO: Member & Comment 추가예정
+        Category singleCategory = categoryService.findSingleCategory(blogPostDto.getCategoryId());
+        Blog blog = mapper.blogPostDtoToBlog(blogPostDto, singleCategory);
         blogService.createBlog(blog);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @GetMapping("/blogs/{blog-id}")
-    public ResponseEntity getPost(@PathVariable("blog-id") long blogId) {
-        blogService.deleteBlog(blogId);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping("/blogs")
-    public ResponseEntity getPosts(@RequestParam(defaultValue = "likes", required = false) String tab) {
+    @PatchMapping("/edit/{blog-id}")
+    public ResponseEntity patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
+                                    @PathVariable("blog-id") @Positive long blogId) {
+        blogPatchDto.setBlogId(blogId);
+        Category singleCategory = categoryService.findSingleCategory(blogPatchDto.getCategoryId());
+        Blog blog = mapper.blogPatchDtoToBlog(blogPatchDto, singleCategory);
+        blogService.editBlog(blog);
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @DeleteMapping("blogs/{blog-id}")
-    public ResponseEntity deletePost(@PathVariable("blog-id") long blogId) {
+    @GetMapping("/edit/{blog-id}")
+    public ResponseEntity getPost(@PathVariable("blog-id") @Positive long blogId) {
+        Blog blog = blogService.findBlog(blogId);
+        BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
+
+        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
+    }
+
+    @DeleteMapping("{blog-id}")
+    public ResponseEntity deletePost(@PathVariable("blog-id") @Positive long blogId) {
         blogService.deleteBlog(blogId);
+
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
