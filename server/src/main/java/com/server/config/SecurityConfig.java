@@ -7,6 +7,8 @@ import com.server.security.filter.MemberAuthenticationEntryPoint;
 import com.server.security.handler.MemberAccessDeniedHandler;
 import com.server.security.handler.MemberAuthenticationFailureHandler;
 import com.server.security.handler.MemberAuthenticationSuccessHandler;
+import com.server.security.service.AuthService;
+import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     private final JwtTokenizer jwtTokenizer;
     private final MemberAuthorityUtils authorityUtils;
+    private final RedisService redisService;
+    private final AuthService authService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,6 +47,7 @@ public class SecurityConfig {
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()
+                .logout().disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(new MemberAuthenticationEntryPoint())
                 .accessDeniedHandler(new MemberAccessDeniedHandler())
@@ -77,15 +82,15 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer);
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer, redisService, authService);
             jwtAuthenticationFilter.setFilterProcessesUrl("/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
 
-            builder.addFilter(jwtAuthenticationFilter)
-                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
+            builder.addFilter(jwtAuthenticationFilter) // 인증 시도 필터
+                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class); // 토큰 검증 필터
         }
     }
 }
