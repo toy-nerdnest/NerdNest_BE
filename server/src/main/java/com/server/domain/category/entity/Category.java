@@ -1,20 +1,18 @@
 package com.server.domain.category.entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.server.domain.audit.Auditable;
+import com.server.domain.blog.entity.Blog;
+import lombok.*;
 
 import javax.persistence.*;
-import java.lang.annotation.ElementType;
+import java.util.List;
 
 @Entity
-@Builder
-@Getter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class Category {
+@AllArgsConstructor
+public class Category extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
@@ -22,5 +20,7 @@ public class Category {
     @Column(name = "category_name")
     private String categoryName;
 
+    @OneToMany(mappedBy = "category")
+    private List<Blog> blogList;
 
 }

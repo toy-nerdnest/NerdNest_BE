@@ -3,15 +3,15 @@ package com.server.domain.blog.entity;
 import com.server.domain.audit.Auditable;
 import com.server.domain.category.entity.Category;
 import com.server.domain.member.entity.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.jbosslog.JBossLog;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,20 +20,21 @@ public class Blog extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long blogId;
 
+    @Column(name = "blog_title", length = 30, nullable = false)
     private String blogTitle;
 
+    @Lob
+    @Column(name = "blog_content")
     private String blogContent;
 
+    @Column(name = "title_image_url")
     private String titleImageUrl;
 
-    private String blogPreview;
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+//    @ManyToOne
+//    @JoinColumn(name = "member_id")
+//    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
 }

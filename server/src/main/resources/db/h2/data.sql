@@ -1,0 +1,1 @@
+INSERT INTO category(created_At, modified_At, category_name) VALUES ('2023-03-02T15:44:54.859637', '2023-03-02T15:44:54.859637', '전체보기');
