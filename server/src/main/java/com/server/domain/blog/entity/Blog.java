@@ -5,11 +5,13 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.member.entity.Member;
 import lombok.*;
 import lombok.extern.jbosslog.JBossLog;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,12 +30,11 @@ public class Blog extends Auditable {
     @Column(name = "title_image_url")
     private String titleImageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+//    @ManyToOne
+//    @JoinColumn(name = "member_id")
+//    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
 }
