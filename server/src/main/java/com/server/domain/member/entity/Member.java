@@ -23,7 +23,7 @@ public class Member extends Auditable {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -32,11 +32,21 @@ public class Member extends Auditable {
     @Column
     private String about;
 
+    @Column
+    private String picture;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "image_file_id")
-    private ImageFile imageFile;
+    public Member update(String nickName, String picture) {
+        this.nickName = nickName;
+        this.picture = picture;
+
+        return this;
+    }
+
+//    @OneToOne
+//    @JoinColumn(name = "image_file_id")
+//    private ImageFile imageFile;
 
 }

@@ -45,7 +45,7 @@ public class RedisService {
     }
 
     // refreshToken 삭제
-    public void deleteRefreshToken(String refreshToken) {
-        redisTemplate.delete(refreshToken);
+    public void deleteRefreshToken(String email) {
+        redisTemplate.delete(email);
     }
 }

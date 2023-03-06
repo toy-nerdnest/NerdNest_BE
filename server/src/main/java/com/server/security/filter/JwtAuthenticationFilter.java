@@ -62,10 +62,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = authService.delegateRefreshToken(member);
 
         // todo 생성된 refreshToken redis에 저장해야 함.
-        if(redisService.getRefreshToken(member.getEmail())==null) {
-            redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
-            log.info("save Refresh Token in redis server!");
+        if(redisService.getRefreshToken(member.getEmail())!=null) {
+            redisService.deleteRefreshToken(member.getEmail());
         }
+        redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
+        log.info("save Refresh Token in redis server!");
         //token response body에 넣기
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("memberId", member.getMemberId());

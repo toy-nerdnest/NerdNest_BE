@@ -67,7 +67,7 @@ public class AuthService {
         String refreshToken = redisService.getRefreshToken(email);
 
         if(!refreshToken.isEmpty()) {
-            redisService.deleteRefreshToken(refreshToken);
+            redisService.deleteRefreshToken(email);
         }
         // access token 유효시간을 가져와서 redis 서버에 logout된 token으로 저장
         long expiration = jwtTokenizer.getExpiration(accessToken);
