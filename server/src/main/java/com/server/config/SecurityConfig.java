@@ -1,5 +1,6 @@
 package com.server.config;
 
+import com.server.domain.member.service.MemberService;
 import com.server.security.JwtTokenizer;
 import com.server.security.filter.JwtAuthenticationFilter;
 import com.server.security.filter.JwtVerificationFilter;
@@ -7,10 +8,13 @@ import com.server.security.filter.MemberAuthenticationEntryPoint;
 import com.server.security.handler.MemberAccessDeniedHandler;
 import com.server.security.handler.MemberAuthenticationFailureHandler;
 import com.server.security.handler.MemberAuthenticationSuccessHandler;
+import com.server.security.oauth.handler.OAuth2MemberSuccessHandler;
+import com.server.security.oauth.service.MemberOAuth2UserService;
 import com.server.security.service.AuthService;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +23,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -35,6 +40,7 @@ public class SecurityConfig {
     private final MemberAuthorityUtils authorityUtils;
     private final RedisService redisService;
     private final AuthService authService;
+    private final MemberOAuth2UserService memberOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,7 +60,11 @@ public class SecurityConfig {
                 .and()
                 .apply(new MemberFilterConfigurer())
                 .and()
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .oauth2Login()
+                .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, redisService)) // token 리다이렉트
+                .userInfoEndpoint()
+                .userService(memberOAuth2UserService); // 유저정보 저장
 
         return http.build();
     }
@@ -90,7 +100,7 @@ public class SecurityConfig {
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
 
             builder.addFilter(jwtAuthenticationFilter) // 인증 시도 필터
-                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class); // 토큰 검증 필터
+                    .addFilterAfter(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class); // 토큰 검증 필터
         }
     }
 }

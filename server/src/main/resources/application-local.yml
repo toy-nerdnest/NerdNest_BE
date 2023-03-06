@@ -2,9 +2,9 @@ spring:
   main:
     allow-circular-references: true
   redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-    password: ${REDIS_PASSWORD}
+    host: localhost
+    port: 6379
+
   h2:
     console:
       enabled: true
@@ -24,6 +24,30 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH_ID}
+            client-secret: ${GOOGLE_OAUTH_PW}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${KAKAO_OAUTH_ID}
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope: profile_nickname, profile_image, account_emil
+            client-name: Kakao
+        provider:
+            kakao:
+              authorization_uri: https://kauth.kakao.com/oauth/authorize
+              token_uri: https://kauth.kakao.com/oauth/tokne
+              user-info-uri: https://kapi.kakao.com/v2/user/me
+              user_name_attribute: id
 
 logging:
   level:
