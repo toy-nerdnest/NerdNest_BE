@@ -12,11 +12,12 @@ import java.util.List;
 @Builder
 public class BlogResponseDto {
 
+    private String titleImageUrl;
     private String blogTitle;
     private String blogContent;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
-    private String categoryName;
+    private Long categoryId;
 
 //    private List<Comment> commentList;
 

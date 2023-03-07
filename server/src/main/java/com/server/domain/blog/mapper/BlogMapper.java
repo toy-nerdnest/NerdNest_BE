@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
-import java.util.Optional;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BlogMapper {
@@ -20,7 +19,7 @@ public interface BlogMapper {
     @Mapping(target = "category", source = "category")
     Blog blogPatchDtoToBlog(BlogDto.Patch blogPatchDto, Category category);
 //    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
-    @Mapping(target = "categoryName", expression = "java(blog.getCategory().getCategoryName())")
+    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     BlogResponseDto blogToBlogResponseDto(Blog blog);
     List<BlogResponseDto.WithCategory> blogListToBlogResponseDtoWithCategory(List<Blog> blogs);
 }
