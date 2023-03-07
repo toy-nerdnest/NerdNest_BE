@@ -31,10 +31,9 @@ public class MemberController {
     // 회원가입 -> post
     @PostMapping("/signup")
     public ResponseEntity signupMember(@Valid @RequestBody MemberDto.Post memberPostDto) {
-        // memberservice에 회원 생성 로직 타게 만들기
+
         Member member = memberService.createMember(mapper.memberPostDtoToMember(memberPostDto));
 
-        // 반환 값 -> url, http code 201
         URI location = UriComponentsBuilder.newInstance()
                 .path("/members/{member-id}")
                 .buildAndExpand(member.getMemberId())
@@ -52,11 +51,12 @@ public class MemberController {
             log.error("허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } else if(loginMember.getMemberId() != memberId) {
-            log.error("수정할 memberId : {}, 로그인한 membmerId :{}", memberId, loginMember.getMemberId());
+            log.error("수정할 memberId : {}, 로그인한 memberId :{}", memberId, loginMember.getMemberId());
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Member member = memberService.updateMember(memberId, mapper.memberPatchDtoToMember(memberPatchDto));
+        Member member = memberService
+                .updateMember(memberId, mapper.memberPatchDtoToMember(memberPatchDto));
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);
 
         return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);

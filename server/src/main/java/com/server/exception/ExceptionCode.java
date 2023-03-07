@@ -22,6 +22,9 @@ public enum ExceptionCode {
     // token
     ACCESS_TOKEN_EXPIRATION(401, "Access Token Expiration"),
     REFRESH_TOKEN_EXPIRATION(401, "Refresh Token Expiration"),
+
+    // image
+    IMAGE_FILE_NOT_FONUD(404, "Image file not found"),
     INVALID_TOKEN(400, "Invalid token");
 
     @Getter

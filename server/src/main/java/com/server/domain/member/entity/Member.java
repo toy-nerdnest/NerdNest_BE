@@ -34,21 +34,23 @@ public class Member extends Auditable {
     private String about;
 
     @Column
-    private String picture;
+    private String profileImageUrl;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    public Member update(String nickName, String picture) {
+    public Member update(String nickName, String profileImageUrl) {
         this.nickName = nickName;
-        this.picture = picture;
+        this.profileImageUrl = profileImageUrl;
 
         return this;
     }
 
-//    @OneToOne
-//    @JoinColumn(name = "image_file_id")
-//    private ImageFile imageFile;
+    @OneToOne
+    @JoinColumn(name = "image_file_id")
+    private ImageFile imageFile;
+
+    // blog 매핑
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<Category> categories;

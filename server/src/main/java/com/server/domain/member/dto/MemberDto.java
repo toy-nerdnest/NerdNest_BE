@@ -6,6 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 public class MemberDto {
 
@@ -26,16 +27,19 @@ public class MemberDto {
     @Getter
     @Builder
     public static class Patch {
-        // 이미지 URL
         @NotBlank
         private String nickName;
         @NotNull
         private String about;
+        @Positive
+        @NotNull
+        private Long ImageFileId;
+
     }
     @Getter
     @Builder
     public static class Response {
-        // 이미지 URL
+        private String profileImageUrl;
         private String nickName;
         private String about;
     }

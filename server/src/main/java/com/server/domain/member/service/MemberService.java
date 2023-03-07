@@ -3,11 +3,13 @@ package com.server.domain.member.service;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.repository.CategoryRepository;
 import com.server.domain.category.service.CategoryService;
+import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
 import com.server.security.utils.MemberAuthorityUtils;
+import com.server.utils.CustomBeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +28,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberAuthorityUtils authorityUtils;
     private final PasswordEncoder passwordEncoder;
+    private final CustomBeanUtils customBeanUtils;
+    private final ImageFileService imageFileService;
 
     private final CategoryRepository categoryRepository;
 
@@ -37,6 +41,9 @@ public class MemberService {
         String encryptedPassword = passwordEncoder.encode(member.getPassword());
         member.setPassword(encryptedPassword);
         member.setRoles(authorityUtils.createRole());
+        // 기본 이미지 저장 로직 추가 구현 필요
+//        String imageUrl = imageFileService.getDefaultMemImgUrl();
+//        member.setProfileImageUrl(imageUrl);
 
 
         Member saveMember = memberRepository.save(member);
@@ -54,15 +61,10 @@ public class MemberService {
 
         return saveMember;
     }
-
     // 회원 정보 수정
     public Member updateMember(long memberId, Member member) {
         Member findMember = findVerifiedMember(memberId);
-
-        Optional.ofNullable(member.getNickName())
-                .ifPresent(findMember::setNickName);
-        Optional.ofNullable(member.getAbout())
-                .ifPresent(findMember::setAbout);
+        Member updateMember = (Member) customBeanUtils.copyNonNullProperties(member, findMember);
 
         return memberRepository.save(findMember);
     }

@@ -4,7 +4,6 @@ import com.server.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class OAuthAttributes {
         return Member.builder()
                 .nickName(name)
                 .email(email)
-                .picture(picture)
+                .profileImageUrl(picture)
                 .roles(List.of("USER"))
                 .build();
     }
