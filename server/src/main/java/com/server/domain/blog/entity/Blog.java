@@ -6,6 +6,7 @@ import com.server.domain.member.entity.Member;
 import lombok.*;
 import lombok.extern.jbosslog.JBossLog;
 import org.springframework.stereotype.Service;
+import reactor.util.annotation.Nullable;
 
 import javax.persistence.*;
 
@@ -30,9 +31,9 @@ public class Blog extends Auditable {
     @Column(name = "title_image_url")
     private String titleImageUrl;
 
-//    @ManyToOne
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

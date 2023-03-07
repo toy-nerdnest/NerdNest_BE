@@ -1,5 +1,8 @@
 package com.server.domain.member.service;
 
+import com.server.domain.category.entity.Category;
+import com.server.domain.category.repository.CategoryRepository;
+import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
@@ -8,19 +11,27 @@ import com.server.exception.ExceptionCode;
 import com.server.security.utils.MemberAuthorityUtils;
 import com.server.utils.CustomBeanUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberAuthorityUtils authorityUtils;
     private final PasswordEncoder passwordEncoder;
     private final CustomBeanUtils customBeanUtils;
     private final ImageFileService imageFileService;
+
+    private final CategoryRepository categoryRepository;
 
     // 회원 생성
     public Member createMember(Member member) {
@@ -34,7 +45,19 @@ public class MemberService {
 //        String imageUrl = imageFileService.getDefaultMemImgUrl();
 //        member.setProfileImageUrl(imageUrl);
 
+
         Member saveMember = memberRepository.save(member);
+
+        //category 더미 추가
+        List<Category> categoryList = new ArrayList<>();
+        Category category = Category.builder()
+                .categoryName("없음")
+                .member(saveMember)
+                .build();
+
+        categoryList.add(category);
+        categoryRepository.save(category);
+        member.setCategories(categoryList);
 
         return saveMember;
     }
@@ -45,26 +68,46 @@ public class MemberService {
 
         return memberRepository.save(findMember);
     }
+
     // 회원 정보 가져오기
     public Member findMember(long memberId) {
         Member findMember = findVerifiedMember(memberId);
         return findMember;
     }
 
+    public Member findMember(String nickname) {
+        Member findMember = findVerifiedMember(nickname);
+        return findMember;
+    }
+
+    private Member findVerifiedMember(String nickname) {
+        Optional<Member> optionalMember =
+                memberRepository.findByNickName(nickname);
+
+        Member findMember =
+                optionalMember.orElseThrow(
+                        () -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND)
+                );
+
+        return findMember;
+    }
+
+
     // 닉네임 중복 확인
     public void verifyExistNickName(String nickName) {
         Optional<Member> optionalMember =
                 memberRepository.findByNickName(nickName);
 
-        if(optionalMember.isPresent()){
+        if (optionalMember.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
         }
     }
-    public void verifyExistEmail(String email){
+
+    public void verifyExistEmail(String email) {
         Optional<Member> optionalMember =
                 memberRepository.findByEmail(email);
 
-        if(optionalMember.isPresent()){
+        if (optionalMember.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
         }
     }
@@ -75,7 +118,7 @@ public class MemberService {
 
         Member findMember =
                 optionalMember.orElseThrow(
-                        ()-> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND)
+                        () -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND)
                 );
 
         return findMember;

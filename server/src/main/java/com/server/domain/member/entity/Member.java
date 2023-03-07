@@ -2,6 +2,7 @@ package com.server.domain.member.entity;
 
 import com.server.domain.audit.Auditable;
 import com.server.domain.blog.entity.Blog;
+import com.server.domain.category.entity.Category;
 import com.server.domain.imageFile.entity.ImageFile;
 import lombok.*;
 
@@ -50,5 +51,8 @@ public class Member extends Auditable {
     private ImageFile imageFile;
 
     // blog 매핑
+
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    private List<Category> categories;
 
 }
