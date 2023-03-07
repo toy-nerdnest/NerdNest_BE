@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +35,13 @@ public class BlogController {
     private final CategoryService categoryService;
     private final MemberService memberService;
 
-    @PostMapping("/blogs/{member-id}")
+    @PostMapping("/blogs")
     public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
-                                   @PathVariable(value = "member-id", required = false) long memberId) {
+                                   @AuthenticationPrincipal Member member) {
         //TODO: Member & Comment 추가예정
-        Member member = memberService.findMember(memberId);
+        Member foundMember = memberService.findMember(member.getMemberId());
         Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
-        Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, member);
+        Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
 
         return new ResponseEntity(HttpStatus.CREATED);

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,12 +32,11 @@ public class CategoryController {
     private final CategoryMapper mapper;
     private final MemberService memberService;
 
-    @PostMapping({"/category/{member-id}"})
+    @PostMapping("/category")
     public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
-                                                         @PathVariable("member-id") @Positive Long memberId) {
-        // TODO: memberId
-        Member member = memberService.findMember(memberId);
-        Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, member);
+                                                         @AuthenticationPrincipal Member member) {
+        Member foundMember = memberService.findMember(member.getMemberId());
+        Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, foundMember);
         categoryService.makeSingleCategory(category);
 
         return new ResponseEntity(HttpStatus.CREATED);
@@ -54,7 +54,7 @@ public class CategoryController {
 
     @GetMapping("/category")
     public ResponseEntity<MultiResponseDto> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
-                                                              @RequestParam(required = false, defaultValue = "12") int size) {
+                                                             @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Category> categoryPageInfo = categoryService.findAllCategories(page, size);
         List<Category> categories = categoryPageInfo.getContent();
         List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(categories);

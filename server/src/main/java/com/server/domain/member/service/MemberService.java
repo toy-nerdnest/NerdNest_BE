@@ -44,7 +44,6 @@ public class MemberService {
         //category 더미 추가
         List<Category> categoryList = new ArrayList<>();
         Category category = Category.builder()
-                .categoryId(1L)
                 .categoryName("없음")
                 .member(saveMember)
                 .build();
