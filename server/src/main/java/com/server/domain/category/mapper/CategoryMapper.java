@@ -9,7 +9,6 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.member.entity.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ public interface CategoryMapper {
     Category categoryDtoPostToCategory(CategoryDto.Post categoryDtoPost, Member member);
 
     Category categoryDtoPatchToCategory(CategoryDto.Patch categoryDtoPatch);
-    List<CategoryResponseDto> categoryToCategoryResponseDto(List<Category> categories);
+    List<CategoryResponseDto> categoriesToCategoryResponseDto(List<Category> categories);
     default CategoryResponseDto.Single categoryToCategorySingleResponseDto(List<Blog> blogs) {
         return CategoryResponseDto.Single.builder()
                 .blogList(blogs.stream().map(blog -> {

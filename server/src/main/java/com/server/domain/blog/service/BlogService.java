@@ -51,6 +51,15 @@ public class BlogService {
         return blogs;
     }
 
+    public Page<Blog> findBlogsByCategoryId(long categoryId, int page, int size) {
+        Category singleCategory = categoryService.findSingleCategoryById(categoryId);
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
+        Page<Blog> blogs = blogRepository.findAllByCategory(singleCategory, pageable);
+
+        return blogs;
+    }
+
+
     public Page<Blog> findBlogsByMemberNickname(String nickname, int page, int size) {
         Member member = memberService.findMember(nickname);
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());

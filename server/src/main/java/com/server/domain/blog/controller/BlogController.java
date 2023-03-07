@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class BlogController {
                                    @PathVariable(value = "member-id", required = false) long memberId) {
         //TODO: Member & Comment 추가예정
         Member member = memberService.findMember(memberId);
-        Category category = categoryService.findSingleCategoryByName(blogPostDto.getCategoryName());
+        Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, member);
         blogService.createBlog(blog);
 
@@ -66,27 +67,28 @@ public class BlogController {
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
-    @GetMapping("{category-name}")
-    public ResponseEntity getBlogsByCategoryName(@PathVariable("category-name") String categoryName,
+    @GetMapping("/category/{category-id}")
+    public ResponseEntity getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
                                                  @RequestParam(required = false, defaultValue = "1") int page,
                                                  @RequestParam(required = false, defaultValue = "12") int size) {
-        Page<Blog> blogsPageInfo = blogService.findBlogsByCategoryName(categoryName, page, size);
+        Page<Blog> blogsPageInfo = blogService.findBlogsByCategoryId(categoryId, page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity(new MultiResponseDto<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
     }
 
-    @GetMapping("{nickname}")
-    public ResponseEntity getBlogsByNickname(@PathVariable("nickname") String nickname,
-                                           @RequestParam(required = false, defaultValue = "1") int page,
-                                           @RequestParam(required = false, defaultValue = "12") int size) {
+    // 개인 블로그 데이터 전체 게시글 조회
+    @GetMapping("/all")
+    public ResponseEntity getBlogsByNickname(@RequestParam @NotBlank String nickname,
+                                             @RequestParam(required = false, defaultValue = "1") int page,
+                                             @RequestParam(required = false, defaultValue = "12") int size) {
 
         Page<Blog> blogsPageInfo = blogService.findBlogsByMemberNickname(nickname, page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity(new MultiResponseDto<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
     }
 
     @GetMapping("/edit/{blog-id}")
@@ -97,7 +99,7 @@ public class BlogController {
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
-    @DeleteMapping("{blog-id}")
+    @DeleteMapping("/{blog-id}")
     public ResponseEntity deleteBlog(@PathVariable("blog-id") @Positive long blogId) {
         blogService.deleteBlog(blogId);
 

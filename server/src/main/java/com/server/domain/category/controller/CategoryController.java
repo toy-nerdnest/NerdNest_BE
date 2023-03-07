@@ -7,9 +7,11 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
+import com.server.response.MultiResponseDto;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,9 +30,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper mapper;
-
     private final MemberService memberService;
-    private static final long MAIN_CATEGORY_ID = 1L;
 
     @PostMapping({"/{member-id}"})
     public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
@@ -54,11 +54,21 @@ public class CategoryController {
     }
 
     @GetMapping()
-    public ResponseEntity<SingleResponseDto> getAllCategories() {
-        List<Category> allCategories = categoryService.findAllCategories();
-        List<CategoryResponseDto> categoryResponseDtos = mapper.categoryToCategoryResponseDto(allCategories);
+    public ResponseEntity<MultiResponseDto> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
+                                                              @RequestParam(required = false, defaultValue = "12") int size) {
+        Page<Category> categoryPageInfo = categoryService.findAllCategories(page, size);
+        List<Category> categories = categoryPageInfo.getContent();
+        List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(categories);
 
-        return ResponseEntity.ok(new SingleResponseDto(categoryResponseDtos));
+        return new ResponseEntity(new MultiResponseDto.CategoryList<>(categoryResponseDtos, categoryPageInfo), HttpStatus.OK);
+    }
+
+    @GetMapping("/{member-id}")
+    public ResponseEntity<SingleResponseDto.Category> getAllCategoriesEachMember(@PathVariable("member-id") @Positive long memberId) {
+        List<Category> allCategoriesEachMember = categoryService.findAllCategoriesEachMember(memberId);
+        List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(allCategoriesEachMember);
+
+        return ResponseEntity.ok(new SingleResponseDto.Category(categoryResponseDtos));
     }
 
     @DeleteMapping("/{category-id}")

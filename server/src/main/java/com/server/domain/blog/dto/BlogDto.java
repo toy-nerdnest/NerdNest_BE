@@ -16,7 +16,7 @@ public class BlogDto {
         private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
-        private String categoryName;
+        private long categoryId;
     }
 
     @Getter

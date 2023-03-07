@@ -1,9 +1,8 @@
 package com.server.domain.category.service;
 
-import com.fasterxml.jackson.databind.util.BeanUtil;
-import com.server.domain.blog.entity.Blog;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.repository.CategoryRepository;
+import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
 import com.server.utils.CustomBeanUtils;
@@ -14,7 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.security.cert.CertificateEncodingException;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +24,8 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     private final CustomBeanUtils beanUtils;
+
+    private final MemberService memberService;
 
     public void makeSingleCategory(Category category) {
         verifyCategoryNameExistence(category);
@@ -54,8 +55,14 @@ public class CategoryService {
         return verifyCategoryByName(categoryName);
     }
 
-    public List<Category> findAllCategories() {
-        return categoryRepository.findAll();
+    public List<Category> findAllCategoriesEachMember(@Positive long memberId) {
+        return categoryRepository.findAllByMember(memberService.findMember(memberId));
+    }
+
+    public Page<Category> findAllCategories(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        return categoryRepository.findAll(pageable);
     }
 
     public void deleteSingleCategory(long categoryId) {

@@ -15,7 +15,9 @@ import java.util.Optional;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BlogMapper {
+    @Mapping(target = "category", source = "category")
     Blog blogPostDtoToBlog(BlogDto.Post blogPostDto, Category category, Member member);
+    @Mapping(target = "category", source = "category")
     Blog blogPatchDtoToBlog(BlogDto.Patch blogPatchDto, Category category);
 //    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     @Mapping(target = "categoryName", expression = "java(blog.getCategory().getCategoryName())")

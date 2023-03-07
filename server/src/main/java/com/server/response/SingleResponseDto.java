@@ -7,4 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SingleResponseDto<T> {
     private T data;
+
+    @Getter
+    @AllArgsConstructor
+    public static class Category<T> {
+        private T categoryList;
+    }
 }
