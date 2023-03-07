@@ -70,6 +70,7 @@ jobs:
         echo "GOOGLE_OAUTH_ID=$GOOGLE_OAUTH_ID" >> src/main/resources/env.yml
         echo "GOOGLE_OAUTH_PW=$GOOGLE_OAUTH_PW" >> src/main/resources/env.yml
         echo "KAKAO_OAUTH_ID=$KAKAO_OAUTH_ID" >> src/main/resources/env.yml
+        
     - name: Build with Gradle
       run: ./gradlew build
       
