@@ -28,14 +28,13 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/blogs")
 public class BlogController {
     private final BlogService blogService;
     private final BlogMapper mapper;
     private final CategoryService categoryService;
     private final MemberService memberService;
 
-    @PostMapping("{member-id}")
+    @PostMapping("/blogs/{member-id}")
     public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
                                    @PathVariable(value = "member-id", required = false) long memberId) {
         //TODO: Member & Comment 추가예정
@@ -47,7 +46,7 @@ public class BlogController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @PatchMapping("/edit/{blog-id}")
+    @PatchMapping("/blogs/edit/{blog-id}")
     public ResponseEntity patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
                                     @PathVariable("blog-id") @Positive long blogId) {
         blogPatchDto.setBlogId(blogId);
@@ -58,7 +57,7 @@ public class BlogController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("/{blog-id}")
+    @GetMapping("/blogs/{blog-id}")
     public ResponseEntity getBlogById(@PathVariable("blog-id") @Positive long blogId) {
         //TODO: Comment 추가 필요
         Blog blog = blogService.findBlog(blogId);
@@ -67,7 +66,7 @@ public class BlogController {
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
-    @GetMapping("/category/{category-id}")
+    @GetMapping("/blogs/category/{category-id}")
     public ResponseEntity getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
                                                  @RequestParam(required = false, defaultValue = "1") int page,
                                                  @RequestParam(required = false, defaultValue = "12") int size) {
@@ -79,7 +78,7 @@ public class BlogController {
     }
 
     // 개인 블로그 데이터 전체 게시글 조회
-    @GetMapping("/all")
+    @GetMapping("/blogs/all")
     public ResponseEntity getBlogsByNickname(@RequestParam @NotBlank String nickname,
                                              @RequestParam(required = false, defaultValue = "1") int page,
                                              @RequestParam(required = false, defaultValue = "12") int size) {
@@ -91,7 +90,7 @@ public class BlogController {
         return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
     }
 
-    @GetMapping("/edit/{blog-id}")
+    @GetMapping("/blogs/edit/{blog-id}")
     public ResponseEntity getBlog(@PathVariable("blog-id") @Positive long blogId) {
         Blog blog = blogService.findBlog(blogId);
         BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
@@ -99,7 +98,7 @@ public class BlogController {
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
-    @DeleteMapping("/{blog-id}")
+    @DeleteMapping("/blogs/{blog-id}")
     public ResponseEntity deleteBlog(@PathVariable("blog-id") @Positive long blogId) {
         blogService.deleteBlog(blogId);
 

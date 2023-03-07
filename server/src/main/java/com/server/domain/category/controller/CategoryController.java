@@ -26,13 +26,12 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/category")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper mapper;
     private final MemberService memberService;
 
-    @PostMapping({"/{member-id}"})
+    @PostMapping({"/category/{member-id}"})
     public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
                                                          @PathVariable("member-id") @Positive Long memberId) {
         // TODO: memberId
@@ -43,7 +42,7 @@ public class CategoryController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{category-id}")
+    @PatchMapping("/category/{category-id}")
     public ResponseEntity<HttpStatus> patchSingleCategory(@RequestBody CategoryDto.Patch categoryDtoPatch,
                                                           @PathVariable("category-id") @Min(value = 2) long categoryId) {
         categoryDtoPatch.setCategoryId(categoryId);
@@ -53,7 +52,7 @@ public class CategoryController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping()
+    @GetMapping("/category")
     public ResponseEntity<MultiResponseDto> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
                                                               @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Category> categoryPageInfo = categoryService.findAllCategories(page, size);
@@ -63,7 +62,7 @@ public class CategoryController {
         return new ResponseEntity(new MultiResponseDto.CategoryList<>(categoryResponseDtos, categoryPageInfo), HttpStatus.OK);
     }
 
-    @GetMapping("/{member-id}")
+    @GetMapping("/category/{member-id}")
     public ResponseEntity<SingleResponseDto.Category> getAllCategoriesEachMember(@PathVariable("member-id") @Positive long memberId) {
         List<Category> allCategoriesEachMember = categoryService.findAllCategoriesEachMember(memberId);
         List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(allCategoriesEachMember);
@@ -71,7 +70,7 @@ public class CategoryController {
         return ResponseEntity.ok(new SingleResponseDto.Category(categoryResponseDtos));
     }
 
-    @DeleteMapping("/{category-id}")
+    @DeleteMapping("/category/{category-id}")
     public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId) {
         categoryService.deleteSingleCategory(categoryId);
 
