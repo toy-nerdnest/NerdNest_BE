@@ -45,9 +45,9 @@ public class Member extends Auditable {
         return this;
     }
 
-//    @OneToOne
-//    @JoinColumn(name = "image_file_id")
-//    private ImageFile imageFile;
+    @OneToOne
+    @JoinColumn(name = "image_file_id")
+    private ImageFile imageFile;
 
     // blog 매핑
 
