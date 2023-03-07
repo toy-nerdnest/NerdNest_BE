@@ -19,7 +19,7 @@ spring:
               - profile
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao # 도메인 변경
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope: profile_nickname, profile_image, account_emil
@@ -30,3 +30,4 @@ spring:
                 token_uri: https://kauth.kakao.com/oauth/tokne
                 user-info-uri: https://kapi.kakao.com/v2/user/me
                 user_name_attribute: id
+domain: 15.164.185.150

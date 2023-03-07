@@ -55,6 +55,6 @@ logging:
       springframework:
         orm:
           jpa: DEBUG
-
+domain: localhost
 
 
