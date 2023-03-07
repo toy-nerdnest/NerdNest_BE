@@ -43,10 +43,16 @@ jobs:
         DB_URL: ${{secrets.DB_URL}}
         DB_USERNAME: ${{secrets.DB_USERNAME}}
         DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-        S3_ACCESSKEY: ${{secrets.AWS_ACCESS_KEY}}
-        S3_SECRETKEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         S3_BUCKET: ${{secrets.S3_BUCKET}}
         S3_REGION: ${{secrets.S3_REGION}}
+        REDIS_HOST: ${{secrets.REDIS_HOST}}
+        REDIS_PORT: ${{secrets.REDIS_PORT}}
+        REDIS_PASSWORD: ${{secrets.REDIS_PASSWORD}}
+        GOOGLE_OAUTH_ID: ${{secrets.GOOGLE_OAUTH_ID}}
+        GOOGLE_OAUTH_PW: ${{secrets.GOOGLE_OAUTH_PW}}
+        KAKAO_OAUTH_ID: ${{secrets.KAKAO_OAUTH_ID}}
       run: |
         echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> src/main/resources/env.yml
         echo "JWT_ACCESS_TOKEN_EXPIRATION_MINUTES=$JWT_ACCESS_TOKEN_EXPIRATION_MINUTES" >> src/main/resources/env.yml
@@ -54,11 +60,16 @@ jobs:
         echo "DB_URL=$DB_URL" >> src/main/resources/env.yml
         echo "DB_USERNAME=$DB_USERNAME" >> src/main/resources/env.yml
         echo "DB_PASSWORD=$DB_PASSWORD" >> src/main/resources/env.yml
-        echo "S3_ACCESSKEY=$S3_ACCESSKEY" >> src/main/resources/env.yml
-        echo "S3_SECRETKEY=$S3_SECRETKEY" >> src/main/resources/env.yml
+        echo "AWS_ACCESS_KEY=$AWS_ACCESS_KEY" >> src/main/resources/env.yml
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> src/main/resources/env.yml
         echo "S3_BUCKET=$S3_BUCKET" >> src/main/resources/env.yml
         echo "S3_REGION=$S3_REGION" >> src/main/resources/env.yml
-        
+        echo "REDIS_HOST=$REDIS_HOST" >> src/main/resources/env.yml
+        echo "REDIS_PORT=$REDIS_PORT" >> src/main/resources/env.yml
+        echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> src/main/resources/env.yml
+        echo "GOOGLE_OAUTH_ID=$GOOGLE_OAUTH_ID" >> src/main/resources/env.yml
+        echo "GOOGLE_OAUTH_PW=$GOOGLE_OAUTH_PW" >> src/main/resources/env.yml
+        echo "KAKAO_OAUTH_ID=$KAKAO_OAUTH_ID" >> src/main/resources/env.yml
     - name: Build with Gradle
       run: ./gradlew build
       
