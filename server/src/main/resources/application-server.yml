@@ -1,12 +1,13 @@
 spring:
   main:
     allow-circular-references: true
-  database:
-    url: ${DB_URL}
+
+  datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    schema: classpath:/org/springframework/batch/core/schema-mysql.sql
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   jpa:
     open-in-view: true
     show-sql: false
@@ -17,25 +18,10 @@ spring:
       hibernate:
         format_sql: true
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
     password: ${REDIS_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
 
   security:
     oauth2:
