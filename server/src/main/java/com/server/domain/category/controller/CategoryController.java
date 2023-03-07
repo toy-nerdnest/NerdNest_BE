@@ -5,6 +5,8 @@ import com.server.domain.category.mapper.CategoryMapper;
 import com.server.domain.category.dto.CategoryDto;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
+import com.server.domain.member.entity.Member;
+import com.server.domain.member.service.MemberService;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +28,24 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper mapper;
+
+    private final MemberService memberService;
     private static final long MAIN_CATEGORY_ID = 1L;
 
-    @PostMapping()
-    public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost) {
-        Category category = mapper.categoryDtoPostToCategory(categoryDtoPost);
+    @PostMapping({"/{member-id}"})
+    public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
+                                                         @PathVariable("member-id") @Positive Long memberId) {
+        // TODO: memberId
+        Member member = memberService.findMember(memberId);
+        Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, member);
         categoryService.makeSingleCategory(category);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    @PatchMapping("{category-id}")
+    @PatchMapping("/{category-id}")
     public ResponseEntity<HttpStatus> patchSingleCategory(@RequestBody CategoryDto.Patch categoryDtoPatch,
-                                              @PathVariable("category-id") @Min(value = 2) long categoryId) {
+                                                          @PathVariable("category-id") @Min(value = 2) long categoryId) {
         categoryDtoPatch.setCategoryId(categoryId);
         Category category = mapper.categoryDtoPatchToCategory(categoryDtoPatch);
         categoryService.editSingleCategory(category);
@@ -46,22 +53,15 @@ public class CategoryController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("{category-id}")
-    public ResponseEntity<SingleResponseDto> getSingleCategory(@PathVariable("category-id") @Positive long categoryId) {
-        Category singleCategory = categoryService.findSingleCategory(categoryId);
-
-        return ResponseEntity.ok(new SingleResponseDto(singleCategory));
-    }
-
     @GetMapping()
-    public ResponseEntity<SingleResponseDto> getAllBlogsInMainCategory() {
-        Category singleCategory = categoryService.findSingleCategory(MAIN_CATEGORY_ID);
-        CategoryResponseDto categoryResponseDto = mapper.categoryToCategoryResponseDto(singleCategory);
+    public ResponseEntity<SingleResponseDto> getAllCategories() {
+        List<Category> allCategories = categoryService.findAllCategories();
+        List<CategoryResponseDto> categoryResponseDtos = mapper.categoryToCategoryResponseDto(allCategories);
 
-        return ResponseEntity.ok(new SingleResponseDto(categoryResponseDto));
+        return ResponseEntity.ok(new SingleResponseDto(categoryResponseDtos));
     }
 
-    @DeleteMapping("{category-id}")
+    @DeleteMapping("/{category-id}")
     public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId) {
         categoryService.deleteSingleCategory(categoryId);
 
