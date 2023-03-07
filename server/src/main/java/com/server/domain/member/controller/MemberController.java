@@ -33,6 +33,7 @@ public class MemberController {
     public ResponseEntity signupMember(@Valid @RequestBody MemberDto.Post memberPostDto) {
         // memberservice에 회원 생성 로직 타게 만들기
         Member member = memberService.createMember(mapper.memberPostDtoToMember(memberPostDto));
+
         // 반환 값 -> url, http code 201
         URI location = UriComponentsBuilder.newInstance()
                 .path("/members/{member-id}")

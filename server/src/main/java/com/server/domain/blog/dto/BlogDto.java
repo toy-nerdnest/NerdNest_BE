@@ -16,9 +16,7 @@ public class BlogDto {
         private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
-        @Setter
-        @NotNull
-        private Long categoryId;
+        private long categoryId;
     }
 
     @Getter
@@ -28,7 +26,6 @@ public class BlogDto {
         private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
-        @NotNull
-        private Long categoryId;
+        private String categoryName;
     }
 }
