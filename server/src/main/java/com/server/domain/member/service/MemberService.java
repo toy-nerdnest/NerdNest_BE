@@ -41,13 +41,10 @@ public class MemberService {
         String encryptedPassword = passwordEncoder.encode(member.getPassword());
         member.setPassword(encryptedPassword);
         member.setRoles(authorityUtils.createRole());
-        // 기본 이미지 저장 로직 추가 구현 필요
-//        String imageUrl = imageFileService.getDefaultMemImgUrl();
-//        member.setProfileImageUrl(imageUrl);
 
+        member.setProfileImageUrl(imageFileService.getDefaultMemImgUrl());
 
         Member saveMember = memberRepository.save(member);
-
         //category 더미 추가
         List<Category> categoryList = new ArrayList<>();
         Category category = Category.builder()
@@ -57,13 +54,15 @@ public class MemberService {
 
         categoryList.add(category);
         categoryRepository.save(category);
-        member.setCategories(categoryList);
+
+        saveMember.setCategories(categoryList);
 
         return saveMember;
     }
     // 회원 정보 수정
     public Member updateMember(long memberId, Member member) {
         Member findMember = findVerifiedMember(memberId);
+
         Member updateMember = (Member) customBeanUtils.copyNonNullProperties(member, findMember);
 
         return memberRepository.save(findMember);

@@ -24,6 +24,7 @@ import java.net.URI;
 @Valid
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = "*")
 public class MemberController {
     private final MemberService memberService;
     private final MemberMapper mapper;
