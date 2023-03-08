@@ -2,6 +2,7 @@ package com.server.domain.category.service;
 
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.repository.CategoryRepository;
+import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
@@ -80,4 +81,12 @@ public class CategoryService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CATEGORY_NOT_FOUND));
     }
 
+    public void verifyOwner(long categoryId, Member loginMember) {
+        Member foundMember = memberService.findMember(loginMember.getMemberId());
+        Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
+
+        if (foundMember.getMemberId() != ownerId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
+        }
+    }
 }

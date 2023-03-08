@@ -48,13 +48,7 @@ public class CategoryController {
     public ResponseEntity<HttpStatus> patchSingleCategory(@RequestBody CategoryDto.Patch categoryDtoPatch,
                                                           @PathVariable("category-id") @Min(value = 2) long categoryId,
                                                           @AuthenticationPrincipal Member loginMember) {
-        Member foundMember = memberService.findMember(loginMember.getMemberId());
-        Long ownerId = categoryService.findSingleCategoryById(categoryId).getMember().getMemberId();
-
-        if (foundMember.getMemberId() != ownerId) {
-            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
-        }
-
+        categoryService.verifyOwner(categoryId, loginMember);
         categoryDtoPatch.setCategoryId(categoryId);
         Category category = mapper.categoryDtoPatchToCategory(categoryDtoPatch);
         categoryService.editSingleCategory(category);
@@ -81,7 +75,9 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{category-id}")
-    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId) {
+    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId,
+                                                           @AuthenticationPrincipal Member loginMember) {
+        categoryService.verifyOwner(categoryId, loginMember);
         categoryService.deleteSingleCategory(categoryId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
