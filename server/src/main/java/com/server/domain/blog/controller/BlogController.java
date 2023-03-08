@@ -37,9 +37,9 @@ public class BlogController {
 
     @PostMapping("/blogs")
     public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
-                                   @AuthenticationPrincipal Member member) {
-        //TODO: Member & Comment 추가예정
-        Member foundMember = memberService.findMember(member.getMemberId());
+                                   @AuthenticationPrincipal Member loginMember) {
+        //TODO: Comment 추가예정
+        Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
@@ -49,7 +49,9 @@ public class BlogController {
 
     @PatchMapping("/blogs/edit/{blog-id}")
     public ResponseEntity patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
-                                    @PathVariable("blog-id") @Positive long blogId) {
+                                    @PathVariable("blog-id") @Positive long blogId,
+                                    @AuthenticationPrincipal Member loginMember) {
+        blogService.verifyOwner(blogId, loginMember);
         blogPatchDto.setBlogId(blogId);
         Category singleCategory = categoryService.findSingleCategoryByName(blogPatchDto.getCategoryName());
         Blog blog = mapper.blogPatchDtoToBlog(blogPatchDto, singleCategory);
@@ -128,7 +130,9 @@ public class BlogController {
     }
 
     @DeleteMapping("/blogs/{blog-id}")
-    public ResponseEntity deleteBlog(@PathVariable("blog-id") @Positive long blogId) {
+    public ResponseEntity deleteBlog(@PathVariable("blog-id") @Positive long blogId,
+                                     @AuthenticationPrincipal Member loginMember) {
+        blogService.verifyOwner(blogId, loginMember);
         blogService.deleteBlog(blogId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);

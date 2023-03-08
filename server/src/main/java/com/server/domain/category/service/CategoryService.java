@@ -82,10 +82,9 @@ public class CategoryService {
     }
 
     public void verifyOwner(long categoryId, Member loginMember) {
-        Member foundMember = memberService.findMember(loginMember.getMemberId());
+        Long loginMemberId = loginMember.getMemberId();
         Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
-
-        if (foundMember.getMemberId() != ownerId) {
+        if (loginMemberId != ownerId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
         }
     }

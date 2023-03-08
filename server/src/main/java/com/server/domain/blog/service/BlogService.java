@@ -90,4 +90,11 @@ public class BlogService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.BLOG_NOT_FOUND));
     }
 
+    public void verifyOwner(long blogId, Member loginMember) {
+        Long loginMemberId = loginMember.getMemberId();
+        Long ownerId = findBlog(blogId).getMember().getMemberId();
+        if (loginMemberId != ownerId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
+        }
+    }
 }
