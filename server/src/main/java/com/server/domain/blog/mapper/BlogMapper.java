@@ -35,6 +35,7 @@ public interface BlogMapper {
                     .blogContent(blog.getBlogContent())
                     .createdAt(blog.getCreatedAt())
                     .writer(blog.getMember().getNickName())
+                    .likeCount(blog.getLikes().size())
                     .build();
         }).collect(Collectors.toList());
 
