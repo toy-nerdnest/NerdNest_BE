@@ -35,4 +35,22 @@ public class BlogResponseDto {
 //        private int likeCount;
     }
 
+    @Builder
+    @Data
+    public static class Home {
+        private Long memberId;
+        private Long blogId;
+        private String titleImageUrl;
+        private String blogTitle;
+        private String blogContent;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일", timezone = "Asia/Seoul")
+        private LocalDateTime createdAt;
+        private String writer; // 작성자는 nickname과 동일
+
+//        private int commentCount; //TODO
+//        private int likeCount; //TODO
+
+    }
+
 }
