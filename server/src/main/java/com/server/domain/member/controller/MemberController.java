@@ -40,6 +40,8 @@ public class MemberController {
                 .buildAndExpand(member.getMemberId())
                 .toUri();
 
+        log.info("Success Member Signup!");
+
         return ResponseEntity.created(location).build();
     }
 

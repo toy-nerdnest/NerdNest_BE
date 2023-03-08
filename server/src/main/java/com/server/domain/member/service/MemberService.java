@@ -43,6 +43,7 @@ public class MemberService {
         member.setRoles(authorityUtils.createRole());
 
         member.setProfileImageUrl(imageFileService.getDefaultMemImgUrl());
+        log.info("멤버 프로필에 기본이미지 저장");
 
         Member saveMember = memberRepository.save(member);
         //category 더미 추가
@@ -64,7 +65,7 @@ public class MemberService {
         Member findMember = findVerifiedMember(memberId);
 
         Member updateMember = (Member) customBeanUtils.copyNonNullProperties(member, findMember);
-
+        log.info("멤버 정보 수정 완료");
         return memberRepository.save(findMember);
     }
 

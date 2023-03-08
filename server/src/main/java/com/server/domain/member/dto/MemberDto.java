@@ -19,8 +19,7 @@ public class MemberDto {
         private String nickName;
 
         @NotBlank
-
-        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[a-zA-Z\\d!@#$%^&*()_+]{6,10}$")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[a-zA-Z\\d!@#$%^&*()_+]{6,10}$")  // 변경필
         private String password;
     }
 
@@ -34,8 +33,6 @@ public class MemberDto {
         @NotNull
         private String about;
 
-        @Positive
-        @NotNull
         private Long profileImageUrl;
     }
     @Getter

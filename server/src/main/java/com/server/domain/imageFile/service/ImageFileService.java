@@ -53,6 +53,8 @@ public class ImageFileService {
                 .member(member)
                 .build();
 
+        log.info("Uploading Member's Image in DB");
+
         return imageFileRepository.save(imageFile);
     }
 
@@ -77,6 +79,8 @@ public class ImageFileService {
                 .imageFileUrl(imgUrl)
                 .member(member)
                 .build();
+
+        log.info("Uploading Blog's Title Image in DB");
 
         return imageFileRepository.save(imageFile);
     }

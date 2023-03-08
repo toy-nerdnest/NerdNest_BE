@@ -5,6 +5,7 @@ import com.server.domain.member.repository.MemberRepository;
 import com.server.security.oauth.utils.OAuthAttributes;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -15,10 +16,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     // 사용자의 정보를 기반으로 가입 및 정보 저장 기능을 한다.
     private final MemberRepository memberRepository;
@@ -43,10 +44,12 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private Member saveMember(OAuthAttributes attributes) {
-        // 이메일 중복 여부 확인
+
         Member member = memberRepository.findByEmail(attributes.getEmail())
                 .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
                 .orElse(attributes.toEntity());
+
+        log.info("OAuth : 회원가입 성공");
 
         return memberRepository.save(member);
     }

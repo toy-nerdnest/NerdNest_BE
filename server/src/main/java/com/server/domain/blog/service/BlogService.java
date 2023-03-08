@@ -5,6 +5,7 @@ import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
+import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
@@ -27,8 +28,13 @@ public class BlogService {
     private final CustomBeanUtils beanUtils;
     private final CategoryService categoryService;
     private final MemberService memberService;
+    private final ImageFileService imageFileService;
 
     public void createBlog(Blog blog) {
+
+        if(blog.getTitleImageUrl() == null) {
+            blog.setTitleImageUrl(imageFileService.getDefaultTitleImgUrl());
+        }
         blogRepository.save(blog);
     }
 

@@ -2,6 +2,7 @@ package com.server.domain.blog.entity;
 
 import com.server.domain.audit.Auditable;
 import com.server.domain.category.entity.Category;
+import com.server.domain.imageFile.entity.ImageFile;
 import com.server.domain.member.entity.Member;
 import lombok.*;
 import lombok.extern.jbosslog.JBossLog;
@@ -38,4 +39,8 @@ public class Blog extends Auditable {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToOne
+    @JoinColumn(name = "image_file_id")
+    private ImageFile imageFile;
 }
