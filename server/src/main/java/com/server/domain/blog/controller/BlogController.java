@@ -91,7 +91,7 @@ public class BlogController {
     @GetMapping("/blogs/{blog-id}")
     public ResponseEntity getBlogById(@PathVariable("blog-id") @Positive long blogId) {
         //TODO: Comment 추가 필요
-        Blog blog = blogService.findBlog(blogId);
+        Blog blog = blogService.findBlogById(blogId);
         BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
 
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
@@ -123,7 +123,7 @@ public class BlogController {
 
     @GetMapping("/blogs/edit/{blog-id}")
     public ResponseEntity getBlog(@PathVariable("blog-id") @Positive long blogId) {
-        Blog blog = blogService.findBlog(blogId);
+        Blog blog = blogService.findBlogById(blogId);
         BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
 
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));

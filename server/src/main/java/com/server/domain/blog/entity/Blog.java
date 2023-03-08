@@ -3,6 +3,7 @@ package com.server.domain.blog.entity;
 import com.server.domain.audit.Auditable;
 import com.server.domain.category.entity.Category;
 import com.server.domain.imageFile.entity.ImageFile;
+import com.server.domain.likes.entity.Like;
 import com.server.domain.member.entity.Member;
 import lombok.*;
 import lombok.extern.jbosslog.JBossLog;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.util.annotation.Nullable;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -43,4 +46,7 @@ public class Blog extends Auditable {
     @OneToOne
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
+    Set<Like> likes = new HashSet<>();
 }

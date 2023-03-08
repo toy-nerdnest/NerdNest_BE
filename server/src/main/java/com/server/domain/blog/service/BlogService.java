@@ -1,6 +1,5 @@
 package com.server.domain.blog.service;
 
-import com.server.domain.blog.dto.BlogResponseDto;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
@@ -17,9 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +35,13 @@ public class BlogService {
     }
 
     public void editBlog(Blog blog) {
-        Blog dbBlog = findBlog(blog.getBlogId());
+        Blog dbBlog = findBlogById(blog.getBlogId());
         beanUtils.copyNonNullProperties(blog, dbBlog);
 
         blogRepository.save(dbBlog);
     }
 
-    public Blog findBlog(long blogId) {
+    public Blog findBlogById(Long blogId) {
         return verifyBlogId(blogId);
     }
 
@@ -92,7 +88,7 @@ public class BlogService {
 
     public void verifyOwner(long blogId, Member loginMember) {
         Long loginMemberId = loginMember.getMemberId();
-        Long ownerId = findBlog(blogId).getMember().getMemberId();
+        Long ownerId = findBlogById(blogId).getMember().getMemberId();
         if (loginMemberId != ownerId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
         }

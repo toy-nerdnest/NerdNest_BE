@@ -3,7 +3,6 @@ package com.server.domain.likes.entity;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.member.entity.Member;
 import lombok.*;
-import org.springframework.data.util.Lazy;
 
 import javax.persistence.*;
 
@@ -12,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Likes {
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +26,8 @@ public class Likes {
     @JoinColumn(name = "blog_id")
     private Blog blog;
 
+    public Like(Member member, Blog blog) {
+        this.member = member;
+        this.blog = blog;
+    }
 }

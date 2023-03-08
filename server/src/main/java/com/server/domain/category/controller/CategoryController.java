@@ -7,8 +7,6 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
-import com.server.exception.BusinessLogicException;
-import com.server.exception.ExceptionCode;
 import com.server.response.MultiResponseDto;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
