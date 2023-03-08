@@ -40,7 +40,13 @@ public class ImageFileController {
     }
     // blog 타이틀 이미지 업로드
     @PostMapping("/blog")
-    public ResponseEntity uploadBlogTitleImg (@RequestParam("image")MultipartFile multipartFile) {
-        return null;
+    public ResponseEntity uploadBlogTitleImg (@RequestParam("image")MultipartFile multipartFile,
+                                              @AuthenticationPrincipal Member loginMember) throws IOException {
+        Member findMember = memberService.findMember(loginMember.getMemberId());
+        ImageFile imageFile = imageFileService.uploadBlogTitleImg(multipartFile, findMember);
+
+        ImageFileResponseDto response = mapper.imageFileToImageFileResponseDto(imageFile);
+
+        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 }

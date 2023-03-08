@@ -28,7 +28,7 @@ public class ImageFileService {
     @Value("${S3_BUCKET}")
     private String s3Bucket;
 
-    private final AmazonS3 amazonS3Client;
+    private final AmazonS3Client amazonS3Client;
 
     public ImageFile uploadMemImg(Member member, MultipartFile multipartFile) throws IOException {
 
@@ -53,12 +53,12 @@ public class ImageFileService {
                 .member(member)
                 .build();
 
-        member.setImageFile(imageFile);
+        log.info("Uploading Member's Image in DB");
 
         return imageFileRepository.save(imageFile);
     }
 
-    public ImageFile uploadBlogTitleImg(MultipartFile multipartFile) throws IOException {
+    public ImageFile uploadBlogTitleImg(MultipartFile multipartFile, Member member) throws IOException {
         String imageFileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
 
 
@@ -77,29 +77,27 @@ public class ImageFileService {
         ImageFile imageFile = ImageFile.builder()
                 .imageFileName(imageFileName)
                 .imageFileUrl(imgUrl)
+                .member(member)
                 .build();
+
+        log.info("Uploading Blog's Title Image in DB");
 
         return imageFileRepository.save(imageFile);
     }
 
-    // 존재하는 id인지 검증
-    public ImageFile verifyExistImgFile(Long imgId) {
-        Optional<ImageFile> optionalImageFile =
-                imageFileRepository.findById(imgId);
+//     기본 멤버 프로필 이미지 가져오기
+    public String getDefaultMemImgUrl() {
+        String imageFileName = "default-member";
+        String imageFileUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket + "/member", imageFileName));
 
-        ImageFile imageFile = optionalImageFile
-                .orElseThrow(
-                        () -> new BusinessLogicException(ExceptionCode.IMAGE_FILE_NOT_FONUD)
-                );
-
-        return imageFile;
+        return imageFileUrl;
     }
 
-    // 기본 멤버 프로필 이미지 가져오기
-//    public String getDefaultMemImgUrl() {
-//        String imageFileName = "default-member";
-//        String imageFileUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket + "/member", imageFileName));
-//
-//        return imageFileUrl;
-//    }
+//     기본 썸네일 이미지 가져오기
+    public String getDefaultTitleImgUrl() {
+        String imageFileName = "default-title";
+        String imageFileUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket+"/blog", imageFileName));
+
+        return imageFileUrl;
+    }
 }

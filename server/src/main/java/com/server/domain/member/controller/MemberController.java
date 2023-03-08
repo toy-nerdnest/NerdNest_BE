@@ -24,6 +24,7 @@ import java.net.URI;
 @Valid
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = "*")
 public class MemberController {
     private final MemberService memberService;
     private final MemberMapper mapper;
@@ -38,6 +39,8 @@ public class MemberController {
                 .path("/members/{member-id}")
                 .buildAndExpand(member.getMemberId())
                 .toUri();
+
+        log.info("Success Member Signup!");
 
         return ResponseEntity.created(location).build();
     }

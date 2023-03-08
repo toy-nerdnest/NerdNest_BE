@@ -3,10 +3,7 @@ package com.server.domain.member.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 
 public class MemberDto {
 
@@ -18,9 +15,11 @@ public class MemberDto {
         private String email;
 
         @NotBlank
+        @Pattern(regexp = "^[0-9a-zA-Z가-핳]{2,10}$")
         private String nickName;
 
         @NotBlank
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+])[a-zA-Z\\d!@#$%^&*()_+]{6,10}$")  // 변경필
         private String password;
     }
 
@@ -28,19 +27,19 @@ public class MemberDto {
     @Builder
     public static class Patch {
         @NotBlank
+        @Pattern(regexp = "^[0-9a-zA-Z가-핳]{2,10}$")
         private String nickName;
+
         @NotNull
         private String about;
-        @Positive
-        @NotNull
-        private Long ImageFileId;
 
+        private Long profileImageUrl;
     }
     @Getter
     @Builder
     public static class Response {
-        private String profileImageUrl;
         private String nickName;
         private String about;
+        private String profileImageUrl;
     }
 }

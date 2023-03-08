@@ -51,6 +51,8 @@ public class Member extends Auditable {
     private ImageFile imageFile;
 
     // blog 매핑
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    private List<Blog> blogs;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<Category> categories;
