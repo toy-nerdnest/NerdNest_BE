@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BlogMapper {
@@ -22,4 +23,20 @@ public interface BlogMapper {
     @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     BlogResponseDto blogToBlogResponseDto(Blog blog);
     List<BlogResponseDto.WithCategory> blogListToBlogResponseDtoWithCategory(List<Blog> blogs);
+
+
+    default List<BlogResponseDto.Home> blogListToBlogResponseHomeDto(List<Blog> blogs) {
+        return blogs.stream().map(blog -> {
+            return BlogResponseDto.Home.builder()
+                    .memberId(blog.getMember().getMemberId())
+                    .blogId(blog.getBlogId())
+                    .titleImageUrl(blog.getTitleImageUrl())
+                    .blogTitle(blog.getBlogTitle())
+                    .blogContent(blog.getBlogContent())
+                    .createdAt(blog.getCreatedAt())
+                    .writer(blog.getMember().getNickName())
+                    .build();
+        }).collect(Collectors.toList());
+
+    }
 }
