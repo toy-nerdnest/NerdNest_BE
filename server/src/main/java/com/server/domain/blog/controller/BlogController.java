@@ -58,6 +58,34 @@ public class BlogController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @GetMapping("/home/blogs")
+    public ResponseEntity getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
+                                          @RequestParam(defaultValue = "1", required = false) int page,
+                                          @RequestParam(defaultValue = "12", required = false) int size) {
+        //TODO : tab에 따른 likes 정렬기능 추가예정
+        Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
+        List<Blog> blogs = blogsPageInfo.getContent();
+        List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
+
+        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseHomeDto, blogsPageInfo), HttpStatus.OK);
+    }
+
+    private static String switchTabToSort(String tab) {
+        String sort = "";
+        switch (tab) {
+            case "newest":
+                sort = "blogId";
+                break;
+//            case "likes":
+//                sort = "likes";
+//                break;
+//            case "views":
+//                sort = "views";
+//                break;
+        }
+        return sort;
+    }
+
     @GetMapping("/blogs/{blog-id}")
     public ResponseEntity getBlogById(@PathVariable("blog-id") @Positive long blogId) {
         //TODO: Comment 추가 필요
