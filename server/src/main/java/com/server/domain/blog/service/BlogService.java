@@ -91,6 +91,13 @@ public class BlogService {
         blogRepository.delete(verifiedBlog);
     }
 
+    public Page<Blog> searchBlog(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by("blogId").descending());
+        Page<Blog> blogs = blogRepository.findByBlogContentContaining(keyword, pageable);
+
+        return blogs;
+    }
+
     private Blog verifyBlogId(long blogId) {
         return blogRepository.findById(blogId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.BLOG_NOT_FOUND));
