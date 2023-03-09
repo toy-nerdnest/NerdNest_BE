@@ -1,8 +1,10 @@
 package com.server.domain.blog.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.server.domain.likes.entity.Like;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 

@@ -31,7 +31,7 @@ public interface BlogMapper {
                     .blogTitle(blog.getBlogTitle())
                     .createdAt(blog.getCreatedAt())
                     .modifiedAt(blog.getModifiedAt())
-                    .likeCount(blog.getLikes().size())
+                    .likeCount(blog.getLikeCount())
                     .build();
         }).collect(Collectors.toList());
     }
@@ -46,7 +46,7 @@ public interface BlogMapper {
                     .blogContent(blog.getBlogContent())
                     .createdAt(blog.getCreatedAt())
                     .writer(blog.getMember().getNickName())
-                    .likeCount(blog.getLikes().size())
+                    .likeCount(blog.getLikeCount())
                     .build();
         }).collect(Collectors.toList());
 
