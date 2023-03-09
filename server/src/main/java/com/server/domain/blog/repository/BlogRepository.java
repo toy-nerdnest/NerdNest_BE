@@ -14,6 +14,6 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     Page<Blog> findAllByCategory(Category category, Pageable pageable);
     Page<Blog> findAllByMember(Member member, Pageable pageable);
-    List<Blog> findAllByMemberAndBlogStatusIsTrue(Member member);
+    List<Blog> findAllByMemberAndLikeStatusIsTrue(Member member);
 //    List<Blog> findAllByMemberAndBlogS(Member member);
 }

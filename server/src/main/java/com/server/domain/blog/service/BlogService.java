@@ -73,7 +73,7 @@ public class BlogService {
 
     public List<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
-        List<Blog> blogs = blogRepository.findAllByMemberAndBlogStatusIsTrue(member);
+        List<Blog> blogs = blogRepository.findAllByMemberAndLikeStatusIsTrue(member);
 
         return blogs;
     }
@@ -97,7 +97,7 @@ public class BlogService {
     }
 
     public void setLike(Blog blog, boolean like) {
-        blog.setBlogStatus(like);
+        blog.setLikeStatus(like);
         blogRepository.save(blog);
     }
 
