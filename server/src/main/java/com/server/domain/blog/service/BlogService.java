@@ -5,6 +5,7 @@ import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
+import com.server.domain.likes.entity.Like;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
@@ -16,6 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +71,12 @@ public class BlogService {
         return blogs;
     }
 
+    public List<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
+        List<Blog> blogs = blogRepository.findAllByMemberAndBlogStatusIsTrue(member);
+
+        return blogs;
+    }
 
     public Page<Blog> findBlogsByMemberNickname(String nickname, int page, int size) {
         Member member = memberService.findMember(nickname);
@@ -86,6 +96,11 @@ public class BlogService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.BLOG_NOT_FOUND));
     }
 
+    public void setLike(Blog blog, boolean like) {
+        blog.setBlogStatus(like);
+        blogRepository.save(blog);
+    }
+
     public void verifyOwner(long blogId, Member loginMember) {
         Long loginMemberId = loginMember.getMemberId();
         Long ownerId = findBlogById(blogId).getMember().getMemberId();
@@ -93,4 +108,5 @@ public class BlogService {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
         }
     }
+
 }

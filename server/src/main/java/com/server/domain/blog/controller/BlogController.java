@@ -9,6 +9,7 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
+import com.server.response.ListResponseDto;
 import com.server.response.MultiResponseDto;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,7 @@ public class BlogController {
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseHomeDto, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity(new ListResponseDto(blogResponseHomeDto), HttpStatus.OK);
     }
 
     private static String switchTabToSort(String tab) {
@@ -78,14 +79,22 @@ public class BlogController {
             case "newest":
                 sort = "blogId";
                 break;
-//            case "likes":
-//                sort = "likes";
-//                break;
-//            case "views":
-//                sort = "views";
-//                break;
+            case "likes":
+                sort = "likes";
+                break;
         }
         return sort;
+    }
+
+    @GetMapping("/home/blogs/mylikes")
+    public ResponseEntity getBlogHomeDataByMyLikes(@RequestParam(defaultValue = "1", required = false) int page,
+                                                   @RequestParam(defaultValue = "12", required = false) int size,
+                                                   @AuthenticationPrincipal Member loginMember) {
+        Member member = memberService.findMember(loginMember.getMemberId());
+        List<Blog> blogsByMemberWithLike = blogService.findBlogsByMemberWithLike(member, page, size);
+        List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogsByMemberWithLike);
+
+        return new ResponseEntity(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
     }
 
     @GetMapping("/blogs/{blog-id}")

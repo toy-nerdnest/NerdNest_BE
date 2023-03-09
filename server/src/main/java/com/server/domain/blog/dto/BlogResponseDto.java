@@ -1,12 +1,10 @@
 package com.server.domain.blog.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.server.domain.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -32,7 +30,7 @@ public class BlogResponseDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 hh시 mm분", timezone = "Asia/Seoul")
         private LocalDateTime modifiedAt;
 //        private int commentCount;
-//        private int likeCount;
+        private int likeCount;
     }
 
     @Builder
