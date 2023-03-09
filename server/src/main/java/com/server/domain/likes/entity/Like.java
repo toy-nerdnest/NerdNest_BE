@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Entity
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Like {
@@ -18,16 +19,32 @@ public class Like {
     @Column(name = "like_id")
     private Long likeId;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private LikeStatus likeStatus = LikeStatus.LIKE;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id")
+    @JoinColumn(name = "blog_id", nullable = false)
     private Blog blog;
 
     public Like(Member member, Blog blog) {
         this.member = member;
         this.blog = blog;
+    }
+
+
+    public enum LikeStatus {
+        LIKE("좋아요"),
+        CANCEL("취소");
+        @Getter
+        public String status;
+
+        LikeStatus(String status) {
+            this.status = status;
+        }
     }
 }
