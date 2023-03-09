@@ -51,7 +51,7 @@ public class MemberController {
                                            @Valid @RequestBody MemberDto.Patch memberPatchDto,
                                            @AuthenticationPrincipal Member loginMember) {
         if(loginMember == null) {
-            log.error("허용되지 않은 접근입니다.");
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } else if(loginMember.getMemberId() != memberId) {
             log.error("수정할 memberId : {}, 로그인한 memberId :{}", memberId, loginMember.getMemberId());

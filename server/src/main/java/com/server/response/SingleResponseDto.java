@@ -13,10 +13,4 @@ public class SingleResponseDto<T> {
     public static class Category<T> {
         private T categoryList;
     }
-
-    @Getter
-    @AllArgsConstructor
-    public static class Like<T> {
-        private T isLike;
-    }
 }

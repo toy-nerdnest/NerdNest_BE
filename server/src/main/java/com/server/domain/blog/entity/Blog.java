@@ -35,8 +35,8 @@ public class Blog extends Auditable {
     @Column(name = "title_image_url")
     private String titleImageUrl;
 
-    @Column(name = "like_status", nullable = false)
-    private boolean likeStatus; // true = 좋아요, false = 좋아요 취소
+    @Column(name = "like_count", nullable = false)
+    private int likeCount;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

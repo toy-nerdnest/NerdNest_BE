@@ -6,6 +6,7 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.repository.LikeRepository;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
@@ -13,14 +14,12 @@ import com.server.exception.ExceptionCode;
 import com.server.utils.CustomBeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +30,7 @@ public class BlogService {
     private final CategoryService categoryService;
     private final MemberService memberService;
     private final ImageFileService imageFileService;
+    private final LikeRepository likeRepository;
 
     public void createBlog(Blog blog) {
 
@@ -74,9 +74,17 @@ public class BlogService {
         return blogs;
     }
 
-    public List<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
+    public Page<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
-        List<Blog> blogs = blogRepository.findAllByMemberAndLikeStatusIsTrue(member);
+
+        List<Like> likes = likeRepository.findByMemberAndLikeStatus(member, Like.LikeStatus.LIKE);
+
+        List<Blog> blogList = likes.stream()
+                        .map(like -> blogRepository.findById(like.getBlog().getBlogId()))
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
+
+        Page<Blog> blogs = new PageImpl<>(blogList, pageable, blogList.size());
 
         return blogs;
     }
@@ -105,11 +113,6 @@ public class BlogService {
     private Blog verifyBlogId(long blogId) {
         return blogRepository.findById(blogId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.BLOG_NOT_FOUND));
-    }
-
-    public void setLike(Blog blog, boolean like) {
-        blog.setLikeStatus(like);
-        blogRepository.save(blog);
     }
 
     public void verifyOwner(long blogId, Member loginMember) {

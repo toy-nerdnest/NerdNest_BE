@@ -5,6 +5,7 @@ import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.service.BlogService;
 import com.server.domain.likes.dto.LikeResponseDto;
 import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.mapper.LikeMapper;
 import com.server.domain.likes.service.LikeService;
 import com.server.domain.member.entity.Member;
 import com.server.response.ListResponseDto;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j
@@ -26,25 +28,21 @@ import java.util.List;
 public class LikeController {
 
     private final LikeService likeService;
-    private final BlogService blogService;
+    private final LikeMapper mapper;
 
     @PostMapping("/blogs/{blog-Id}/likes")
     public ResponseEntity insert(@AuthenticationPrincipal Member loginMember,
-                                 @PathVariable("blog-Id") Long blogId) {
-        // '좋아요'가 있으면 삭제, 없으면 추가
-        Blog blog = blogService.findBlogById(blogId);
-        boolean hasLike = likeService.findLike(loginMember, blog);
+                                 @Positive @PathVariable("blog-Id") Long blogId) {
 
-        if (hasLike) {
-            likeService.deleteLike(loginMember, blog);
-        } else {
-            likeService.addLike(loginMember, blog);
+        if(loginMember == null) {
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        // 로직 처리 후 결과값은 블로그 내 '좋아요'가 있으면 true, 없으면 false
-        boolean curLike = !hasLike;
-        blogService.setLike(blog, curLike);
-        return new ResponseEntity<>(new SingleResponseDto.Like<>(!hasLike), HttpStatus.OK);
+        Like like = likeService.likeBlogs(loginMember, blogId);
+        LikeResponseDto response = mapper.likeToLikeResponseDto(like);
+
+        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
 }
