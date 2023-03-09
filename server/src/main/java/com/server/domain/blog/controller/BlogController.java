@@ -146,4 +146,15 @@ public class BlogController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity searchBlog(@RequestParam(required = false) String keyword,
+                                     @RequestParam(defaultValue = "1") int page,
+                                     @RequestParam(defaultValue = "12") int size) {
+        Page<Blog> pageBlogs = blogService.searchBlog(keyword, page, size);
+        List<Blog> blogs = pageBlogs.getContent();
+        List<BlogResponseDto.Home> responses = mapper.blogListToBlogResponseHomeDto(blogs);
+
+        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(responses, pageBlogs), HttpStatus.OK);
+    }
 }

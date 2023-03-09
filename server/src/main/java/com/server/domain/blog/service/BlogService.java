@@ -12,6 +12,7 @@ import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
 import com.server.utils.CustomBeanUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BlogService {
     private final BlogRepository blogRepository;
@@ -34,6 +36,7 @@ public class BlogService {
 
         if(blog.getTitleImageUrl() == null) {
             blog.setTitleImageUrl(imageFileService.getDefaultTitleImgUrl());
+            log.info("Blog Title Image : 기본 이미지 저장 완료");
         }
         blogRepository.save(blog);
     }
@@ -89,6 +92,14 @@ public class BlogService {
     public void deleteBlog(long blogId) {
         Blog verifiedBlog = verifyBlogId(blogId);
         blogRepository.delete(verifiedBlog);
+    }
+
+    public Page<Blog> searchBlog(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by("blogId").descending());
+        log.info("search keyword : {}", keyword);
+        Page<Blog> blogs = blogRepository.findByBlogTitleContaining(keyword, pageable);
+
+        return blogs;
     }
 
     private Blog verifyBlogId(long blogId) {
