@@ -34,6 +34,7 @@ public interface BlogMapper {
                     .createdAt(blog.getCreatedAt())
                     .modifiedAt(blog.getModifiedAt())
                     .likeCount(blog.getLikeCount())
+                    .commentCount(blog.getCommentCount())
                     .build();
         }).collect(Collectors.toList());
     }
@@ -49,6 +50,7 @@ public interface BlogMapper {
                     .createdAt(blog.getCreatedAt())
                     .writer(blog.getMember().getNickName())
                     .likeCount(blog.getLikeCount())
+                    .commentCount(blog.getCommentCount())
                     .build();
         }).collect(Collectors.toList());
 

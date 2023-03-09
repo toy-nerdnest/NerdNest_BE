@@ -3,6 +3,7 @@ package com.server.domain.member.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
@@ -10,7 +11,7 @@ import javax.validation.constraints.*;
 public class MemberDto {
 
     @Data
-    @Builder
+    @NoArgsConstructor
     public static class Post {
         @NotBlank
         @Email

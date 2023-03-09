@@ -1,6 +1,7 @@
 package com.server.domain.comment.service;
 
 import com.server.domain.blog.entity.Blog;
+import com.server.domain.blog.service.BlogService;
 import com.server.domain.comment.dto.CommentResponseDto;
 import com.server.domain.comment.entity.Comment;
 import com.server.domain.comment.repository.CommentCustomRepositoryImpl;
@@ -9,8 +10,6 @@ import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentCustomRepositoryImpl customRepository;
+    private final BlogService blogService;
+
 
     public Comment createComment(Comment comment, Long parentId) {
 
@@ -40,7 +41,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Comment updateParentComment(Comment comment) {
+    public Comment updateComment(Comment comment) {
         return commentRepository.save(comment);
     }
 
@@ -50,39 +51,8 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> findComments(Blog blog){
+    public List<Comment> findComments(Blog blog) {
         return customRepository.findCommentByBlog(blog);
-    }
-
-    public void deleteComment(Comment comment) {
-        // 자식이 있는 댓글이라면
-        if(comment.getChildren().size() != 0) {
-            // 삭제 상태로 변경
-            comment.changeStatus(Comment.CommentStatus.DEAD);
-        }
-        // 자식이 없는 댓글이라면
-        else {
-            // 삭제 가능한 조상 댓글을 전부 삭제
-            commentRepository.delete(getDeletableAncestorComment(comment));
-        }
-    }
-
-    public Comment getDeletableAncestorComment(Comment comment) {
-        // 자식이 없는 댓글 경우 -> 부모에 판단을 안했음
-        // 너 자식이야? parent != null  == 부모가 있다
-        // 근데 자식이 여러명이면 애초에 부모댓글 삭제 불가(살았던지 죽었던지)
-        // 자식이 1개일 경우 삭제 가능
-        // 근데 이때 조건은 부모도 죽은 상태여야함.
-        // 이때 부모를 재귀로 돌림
-        // 부모 댓글이면 parent == null, 이므로 return comment -> delete 부모댓글 삭제
-        Comment parent = comment.getParent();
-        // 1. 부모 댓글이 존재하고 2. 부모의 자식이 1개이며 3. 부모가 상태가 dead인 경우
-        // 부모가 삭제될 수 있는 조건
-        if(parent != null && parent.getChildren().size() == 1 && parent.getStatus() == Comment.CommentStatus.DEAD){
-            // 재귀로 삭제할 조상을 모두 리턴한다
-            return getDeletableAncestorComment(parent);
-        }
-        return comment;
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +61,7 @@ public class CommentService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.COMMENT_NOT_FOUND));
     }
 
-    public Long countAllCommentsByPost(Blog blog){
+    public Long countAllCommentsByPost(Blog blog) {
         return commentRepository.countByBlog(blog);
     }
 
@@ -129,6 +99,24 @@ public class CommentService {
         });
 
         return result;
+    }
+
+    public void deleteComment(Comment comment) {
+        if (comment.getChildren().size() != 0) {
+            comment.changeStatus(Comment.CommentStatus.DEAD);
+        } else {
+            commentRepository.delete(getDeletableAncestorComment(comment));
+        }
+    }
+
+    public Comment getDeletableAncestorComment(Comment comment) {
+        Comment parent = comment.getParent();
+
+        if (parent != null && parent.getChildren().size() == 1 && parent.getStatus() == Comment.CommentStatus.DEAD) {
+            return getDeletableAncestorComment(parent);
+        }
+
+        return comment;
     }
 
 }

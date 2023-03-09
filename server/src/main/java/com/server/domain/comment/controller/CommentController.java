@@ -45,6 +45,8 @@ public class CommentController {
                                 .build()
                         , commentDto.getParentId());
 
+        blogService.plusBlogCount(comment.getBlog());
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -60,15 +62,18 @@ public class CommentController {
         // TODO: memberId 비교로직
         Comment comment = commentService.findComment(commentId);
         comment.setCommentContent(commentPatchDto.getCommentContent());
+        commentService.updateComment(comment);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{comment-id}")
+    @DeleteMapping("/comments/{comment-id}")
     public ResponseEntity<HttpStatus> deleteComment(@AuthenticationPrincipal Member loginMember,
                                                     @PathVariable("comment-id") @Positive long commentId) {
+
         commentService.verifyOwner(commentId, loginMember);
         Comment comment = commentService.findComment(commentId);
+        blogService.minusBlogCount(comment.getBlog());
         commentService.deleteComment(comment);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

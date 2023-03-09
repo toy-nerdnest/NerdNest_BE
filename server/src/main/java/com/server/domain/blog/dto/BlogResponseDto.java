@@ -33,8 +33,8 @@ public class BlogResponseDto {
         private LocalDateTime createdAt;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 hh시 mm분", timezone = "Asia/Seoul")
         private LocalDateTime modifiedAt;
-        //        private int commentCount;
         private int likeCount;
+        private int commentCount;
     }
 
     @Builder
@@ -49,7 +49,7 @@ public class BlogResponseDto {
         private LocalDateTime createdAt;
         private String writer; // 작성자는 nickname과 동일
         private int likeCount;
-//        private int commentCount; //TODO
+        private int commentCount;
     }
 
     @Builder

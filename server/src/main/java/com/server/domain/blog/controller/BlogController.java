@@ -97,7 +97,7 @@ public class BlogController {
                 sort = "blogId";
                 break;
             case "likes":
-                sort = "likes";
+                sort = "likeCount";
                 break;
         }
         return sort;
