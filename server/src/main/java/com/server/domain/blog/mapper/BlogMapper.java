@@ -5,11 +5,13 @@ import com.server.domain.blog.dto.BlogDto;
 import com.server.domain.blog.dto.BlogResponseDto;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.category.entity.Category;
+import com.server.domain.comment.dto.CommentResponseDto;
 import com.server.domain.member.entity.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,4 +53,15 @@ public interface BlogMapper {
         }).collect(Collectors.toList());
 
     }
+
+    default BlogResponseDto.WithComment blogListToBlogResponseDtoWithComment(Blog blog, List<CommentResponseDto> commentResponseDtos) {
+        return BlogResponseDto.WithComment.builder()
+                .titleImageUrl(blog.getTitleImageUrl())
+                .blogTitle(blog.getBlogTitle())
+                .createdAt(blog.getCreatedAt())
+                .categoryId(blog.getCategory().getCategoryId())
+                .commentList(commentResponseDtos)
+                .build();
+    }
+
 }

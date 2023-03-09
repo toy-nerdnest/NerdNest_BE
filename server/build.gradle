@@ -9,8 +9,9 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.8'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-    id "io.franzbecker.gradle-lombok" version "3.0.0" // lombokc 충돌
+
     //querydsl 추가
+    id "io.franzbecker.gradle-lombok" version "3.0.0" // lombok 충돌
     id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 

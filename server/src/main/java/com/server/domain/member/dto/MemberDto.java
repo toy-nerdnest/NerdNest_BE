@@ -1,13 +1,15 @@
 package com.server.domain.member.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.constraints.*;
 
+@Data
 public class MemberDto {
 
-    @Getter
+    @Data
     @Builder
     public static class Post {
         @NotBlank
