@@ -59,7 +59,7 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        // TODO: memberId 비교로직
+        commentService.verifyOwner(commentId, loginMember);
         Comment comment = commentService.findComment(commentId);
         comment.setCommentContent(commentPatchDto.getCommentContent());
         commentService.updateComment(comment);
