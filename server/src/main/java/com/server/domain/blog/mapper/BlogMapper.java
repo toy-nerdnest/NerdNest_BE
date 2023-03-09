@@ -22,8 +22,19 @@ public interface BlogMapper {
 //    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     BlogResponseDto blogToBlogResponseDto(Blog blog);
-    List<BlogResponseDto.WithCategory> blogListToBlogResponseDtoWithCategory(List<Blog> blogs);
 
+    default List<BlogResponseDto.WithCategory> blogListToBlogResponseDtoWithCategory(List<Blog> blogs) {
+        return blogs.stream().map(blog -> {
+            return BlogResponseDto.WithCategory.builder()
+                    .blogId(blog.getBlogId())
+                    .titleImageUrl(blog.getTitleImageUrl())
+                    .blogTitle(blog.getBlogTitle())
+                    .createdAt(blog.getCreatedAt())
+                    .modifiedAt(blog.getModifiedAt())
+                    .likeCount(blog.getLikes().size())
+                    .build();
+        }).collect(Collectors.toList());
+    }
 
     default List<BlogResponseDto.Home> blogListToBlogResponseHomeDto(List<Blog> blogs) {
         return blogs.stream().map(blog -> {
@@ -35,6 +46,7 @@ public interface BlogMapper {
                     .blogContent(blog.getBlogContent())
                     .createdAt(blog.getCreatedAt())
                     .writer(blog.getMember().getNickName())
+                    .likeCount(blog.getLikes().size())
                     .build();
         }).collect(Collectors.toList());
 

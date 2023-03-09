@@ -34,8 +34,8 @@ public class CategoryController {
 
     @PostMapping("/category")
     public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
-                                                         @AuthenticationPrincipal Member member) {
-        Member foundMember = memberService.findMember(member.getMemberId());
+                                                         @AuthenticationPrincipal Member loginMember) {
+        Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, foundMember);
         categoryService.makeSingleCategory(category);
 
@@ -44,7 +44,9 @@ public class CategoryController {
 
     @PatchMapping("/category/{category-id}")
     public ResponseEntity<HttpStatus> patchSingleCategory(@RequestBody CategoryDto.Patch categoryDtoPatch,
-                                                          @PathVariable("category-id") @Min(value = 2) long categoryId) {
+                                                          @PathVariable("category-id") @Min(value = 2) long categoryId,
+                                                          @AuthenticationPrincipal Member loginMember) {
+        categoryService.verifyOwner(categoryId, loginMember);
         categoryDtoPatch.setCategoryId(categoryId);
         Category category = mapper.categoryDtoPatchToCategory(categoryDtoPatch);
         categoryService.editSingleCategory(category);
@@ -71,7 +73,9 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{category-id}")
-    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId) {
+    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId,
+                                                           @AuthenticationPrincipal Member loginMember) {
+        categoryService.verifyOwner(categoryId, loginMember);
         categoryService.deleteSingleCategory(categoryId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);

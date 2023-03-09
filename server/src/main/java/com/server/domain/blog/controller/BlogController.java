@@ -9,6 +9,7 @@ import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
+import com.server.response.ListResponseDto;
 import com.server.response.MultiResponseDto;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -36,30 +37,32 @@ public class BlogController {
     private final MemberService memberService;
 
     @PostMapping("/blogs")
-    public ResponseEntity postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
-                                   @AuthenticationPrincipal Member member) {
-        //TODO: Member & Comment 추가예정
-        Member foundMember = memberService.findMember(member.getMemberId());
+    public ResponseEntity<HttpStatus> postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
+                                         @AuthenticationPrincipal Member loginMember) {
+        //TODO: Comment 추가예정
+        Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
 
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping("/blogs/edit/{blog-id}")
-    public ResponseEntity patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
-                                    @PathVariable("blog-id") @Positive long blogId) {
+    public ResponseEntity<HttpStatus> patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
+                                    @PathVariable("blog-id") @Positive long blogId,
+                                    @AuthenticationPrincipal Member loginMember) {
+        blogService.verifyOwner(blogId, loginMember);
         blogPatchDto.setBlogId(blogId);
         Category singleCategory = categoryService.findSingleCategoryByName(blogPatchDto.getCategoryName());
         Blog blog = mapper.blogPatchDtoToBlog(blogPatchDto, singleCategory);
         blogService.editBlog(blog);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/home/blogs")
-    public ResponseEntity getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
+    public ResponseEntity<ListResponseDto<?>> getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
                                           @RequestParam(defaultValue = "1", required = false) int page,
                                           @RequestParam(defaultValue = "12", required = false) int size) {
         //TODO : tab에 따른 likes 정렬기능 추가예정
@@ -67,7 +70,7 @@ public class BlogController {
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseHomeDto, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
     }
 
     private static String switchTabToSort(String tab) {
@@ -76,39 +79,47 @@ public class BlogController {
             case "newest":
                 sort = "blogId";
                 break;
-//            case "likes":
-//                sort = "likes";
-//                break;
-//            case "views":
-//                sort = "views";
-//                break;
+            case "likes":
+                sort = "likes";
+                break;
         }
         return sort;
     }
 
+    @GetMapping("/home/blogs/mylikes")
+    public ResponseEntity<ListResponseDto<?>> getBlogHomeDataByMyLikes(@RequestParam(defaultValue = "1", required = false) int page,
+                                                   @RequestParam(defaultValue = "12", required = false) int size,
+                                                   @AuthenticationPrincipal Member loginMember) {
+        Member member = memberService.findMember(loginMember.getMemberId());
+        List<Blog> blogsByMemberWithLike = blogService.findBlogsByMemberWithLike(member, page, size);
+        List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogsByMemberWithLike);
+
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
+    }
+
     @GetMapping("/blogs/{blog-id}")
-    public ResponseEntity getBlogById(@PathVariable("blog-id") @Positive long blogId) {
+    public ResponseEntity<SingleResponseDto<?>> getBlogById(@PathVariable("blog-id") @Positive long blogId) {
         //TODO: Comment 추가 필요
-        Blog blog = blogService.findBlog(blogId);
+        Blog blog = blogService.findBlogById(blogId);
         BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
 
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
     @GetMapping("/blogs/category/{category-id}")
-    public ResponseEntity getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
+    public ResponseEntity<?> getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
                                                  @RequestParam(required = false, defaultValue = "1") int page,
                                                  @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Blog> blogsPageInfo = blogService.findBlogsByCategoryId(categoryId, page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
     }
 
     // 개인 블로그 데이터 전체 게시글 조회
     @GetMapping("/blogs/all")
-    public ResponseEntity getBlogsByNickname(@RequestParam @NotBlank String nickname,
+    public ResponseEntity<?> getBlogsByNickname(@RequestParam @NotBlank String nickname,
                                              @RequestParam(required = false, defaultValue = "1") int page,
                                              @RequestParam(required = false, defaultValue = "12") int size) {
 
@@ -116,21 +127,23 @@ public class BlogController {
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
     }
 
     @GetMapping("/blogs/edit/{blog-id}")
-    public ResponseEntity getBlog(@PathVariable("blog-id") @Positive long blogId) {
-        Blog blog = blogService.findBlog(blogId);
+    public ResponseEntity<SingleResponseDto<?>> getBlog(@PathVariable("blog-id") @Positive long blogId) {
+        Blog blog = blogService.findBlogById(blogId);
         BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
 
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
     }
 
     @DeleteMapping("/blogs/{blog-id}")
-    public ResponseEntity deleteBlog(@PathVariable("blog-id") @Positive long blogId) {
+    public ResponseEntity<HttpStatus> deleteBlog(@PathVariable("blog-id") @Positive long blogId,
+                                     @AuthenticationPrincipal Member loginMember) {
+        blogService.verifyOwner(blogId, loginMember);
         blogService.deleteBlog(blogId);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

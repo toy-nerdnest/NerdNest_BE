@@ -1,7 +1,14 @@
 package com.server.domain.likes.repository;
 
-import com.server.domain.likes.entity.Likes;
+import com.server.domain.blog.entity.Blog;
+import com.server.domain.likes.entity.Like;
+import com.server.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LikeRepository extends JpaRepository<Likes, Long> {
+import java.util.List;
+import java.util.Optional;
+
+public interface LikeRepository extends JpaRepository<Like, Long> {
+    Optional<Like> findByMemberAndBlog(Member member, Blog blog);
+    void deleteByMemberAndBlog(Member member, Blog blog);
 }

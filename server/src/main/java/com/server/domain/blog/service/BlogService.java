@@ -1,11 +1,11 @@
 package com.server.domain.blog.service;
 
-import com.server.domain.blog.dto.BlogResponseDto;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
+import com.server.domain.likes.entity.Like;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.exception.BusinessLogicException;
@@ -39,13 +39,13 @@ public class BlogService {
     }
 
     public void editBlog(Blog blog) {
-        Blog dbBlog = findBlog(blog.getBlogId());
+        Blog dbBlog = findBlogById(blog.getBlogId());
         beanUtils.copyNonNullProperties(blog, dbBlog);
 
         blogRepository.save(dbBlog);
     }
 
-    public Blog findBlog(long blogId) {
+    public Blog findBlogById(Long blogId) {
         return verifyBlogId(blogId);
     }
 
@@ -71,6 +71,12 @@ public class BlogService {
         return blogs;
     }
 
+    public List<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
+        List<Blog> blogs = blogRepository.findAllByMemberAndLikeStatusIsTrue(member);
+
+        return blogs;
+    }
 
     public Page<Blog> findBlogsByMemberNickname(String nickname, int page, int size) {
         Member member = memberService.findMember(nickname);
@@ -88,6 +94,19 @@ public class BlogService {
     private Blog verifyBlogId(long blogId) {
         return blogRepository.findById(blogId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.BLOG_NOT_FOUND));
+    }
+
+    public void setLike(Blog blog, boolean like) {
+        blog.setLikeStatus(like);
+        blogRepository.save(blog);
+    }
+
+    public void verifyOwner(long blogId, Member loginMember) {
+        Long loginMemberId = loginMember.getMemberId();
+        Long ownerId = findBlogById(blogId).getMember().getMemberId();
+        if (loginMemberId != ownerId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
+        }
     }
 
 }
