@@ -28,7 +28,6 @@ public class CommentController {
     @PostMapping("/comments")
     public ResponseEntity postComment(@AuthenticationPrincipal Member loginMember,
                                       @RequestBody @Valid CommentDto commentDto) {
-        // TODO: 로그인 유저 로직 추가
         if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -70,6 +69,10 @@ public class CommentController {
     @DeleteMapping("/comments/{comment-id}")
     public ResponseEntity<HttpStatus> deleteComment(@AuthenticationPrincipal Member loginMember,
                                                     @PathVariable("comment-id") @Positive long commentId) {
+        if (loginMember == null) {
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
         commentService.verifyOwner(commentId, loginMember);
         Comment comment = commentService.findComment(commentId);
