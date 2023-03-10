@@ -61,6 +61,7 @@ cloud:
       secret-key: ${AWS_SECRET_ACCESS_KEY}
     s3:
       bucket: ${S3_BUCKET}
+      endpoint: ${S3_ENDPOINT}
     region:
       static: ${S3_REGION}
     stack:
