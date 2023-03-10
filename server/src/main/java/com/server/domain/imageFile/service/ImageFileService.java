@@ -28,6 +28,9 @@ public class ImageFileService {
     @Value("${S3_BUCKET}")
     private String s3Bucket;
 
+    @Value("${S3_ENDPOINT}")
+    private String s3EndPoint;
+
     private final AmazonS3Client amazonS3Client;
 
     public ImageFile uploadMemImg(Member member, MultipartFile multipartFile) throws IOException {
@@ -45,7 +48,7 @@ public class ImageFileService {
             log.error("Error uploading to AWS S3, Exception: {}",e.getMessage());
         }
 
-        String imgUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket + "/member", imageFileName));
+        String imgUrl = s3EndPoint + "/member/" + imageFileName;
 
         ImageFile imageFile = ImageFile.builder()
                 .imageFileName(imageFileName)
@@ -72,7 +75,7 @@ public class ImageFileService {
             log.error("Error uploading to AWS S3, Exception: {}",e.getMessage());
         }
 
-        String imgUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket + "/blog", imageFileName));
+        String imgUrl = s3EndPoint + "/blog/" + imageFileName;
 
         ImageFile imageFile = ImageFile.builder()
                 .imageFileName(imageFileName)
@@ -88,7 +91,7 @@ public class ImageFileService {
 //     기본 멤버 프로필 이미지 가져오기
     public String getDefaultMemImgUrl() {
         String imageFileName = "default-member";
-        String imageFileUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket + "/member", imageFileName));
+        String imageFileUrl = s3EndPoint + "/member/" + imageFileName;
 
         return imageFileUrl;
     }
@@ -96,7 +99,7 @@ public class ImageFileService {
 //     기본 썸네일 이미지 가져오기
     public String getDefaultTitleImgUrl() {
         String imageFileName = "default-title";
-        String imageFileUrl = String.valueOf(amazonS3Client.getUrl(s3Bucket+"/blog", imageFileName));
+        String imageFileUrl = s3EndPoint + "/blog/" + imageFileName;
 
         return imageFileUrl;
     }
