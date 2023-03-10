@@ -35,8 +35,6 @@ public class MemberDto {
 
         @NotNull
         private String about;
-
-        private Long profileImageUrl;
     }
     @Getter
     @Builder
