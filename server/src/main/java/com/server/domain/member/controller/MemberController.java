@@ -4,14 +4,11 @@ import com.server.domain.member.dto.MemberDto;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.mapper.MemberMapper;
 import com.server.domain.member.service.MemberService;
-import com.server.response.SingleResponseDto;
-import com.server.security.utils.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -62,7 +59,7 @@ public class MemberController {
                 .updateMember(memberId, mapper.memberPatchDtoToMember(memberPatchDto));
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);
 
-        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 닉네임 중복 확인 -> get
@@ -82,7 +79,7 @@ public class MemberController {
         Member member = memberService.findMember(memberId);
         MemberDto.Response response = mapper.memberToMemberResponseDto(member);
 
-        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

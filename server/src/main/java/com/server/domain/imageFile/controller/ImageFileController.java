@@ -6,7 +6,6 @@ import com.server.domain.imageFile.mapper.ImageFileMapper;
 import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
-import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class ImageFileController {
 
         ImageFileResponseDto response = mapper.imageFileToImageFileResponseDto(imageFile);
 
-        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     // blog 타이틀 이미지 업로드
     @PostMapping("/blog")
@@ -47,6 +46,6 @@ public class ImageFileController {
 
         ImageFileResponseDto response = mapper.imageFileToImageFileResponseDto(imageFile);
 
-        return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
