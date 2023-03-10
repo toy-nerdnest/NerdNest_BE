@@ -120,7 +120,7 @@ public class BlogController {
         List<Blog> blogs = blogPage.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseHomeDto, blogPage), HttpStatus.OK);
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
     }
 
     @GetMapping("/blogs/{blog-id}")
