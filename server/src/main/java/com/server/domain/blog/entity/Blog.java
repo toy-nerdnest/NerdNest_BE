@@ -4,12 +4,9 @@ import com.server.domain.audit.Auditable;
 import com.server.domain.category.entity.Category;
 import com.server.domain.comment.entity.Comment;
 import com.server.domain.imageFile.entity.ImageFile;
-import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.entity.Likes;
 import com.server.domain.member.entity.Member;
 import lombok.*;
-import lombok.extern.jbosslog.JBossLog;
-import org.springframework.stereotype.Service;
-import reactor.util.annotation.Nullable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ public class Blog extends Auditable {
     private ImageFile imageFile;
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
-    Set<Like> likes = new HashSet<>();
+    Set<Likes> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
     List<Comment> commentList = new ArrayList<>();

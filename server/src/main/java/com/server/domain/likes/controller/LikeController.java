@@ -1,7 +1,7 @@
 package com.server.domain.likes.controller;
 
 import com.server.domain.likes.dto.LikeResponseDto;
-import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.entity.Likes;
 import com.server.domain.likes.mapper.LikeMapper;
 import com.server.domain.likes.service.LikeService;
 import com.server.domain.member.entity.Member;
@@ -31,8 +31,8 @@ public class LikeController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Like like = likeService.likeBlogs(loginMember, blogId);
-        LikeResponseDto response = mapper.likeToLikeResponseDto(like);
+        Likes likes = likeService.likeBlogs(loginMember, blogId);
+        LikeResponseDto response = mapper.likeToLikeResponseDto(likes);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

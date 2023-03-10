@@ -12,8 +12,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Likes")
-public class Like {
+public class Likes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +31,7 @@ public class Like {
     @JoinColumn(name = "blog_id", nullable = false)
     private Blog blog;
 
-    public Like(Member member, Blog blog) {
+    public Likes(Member member, Blog blog) {
         this.member = member;
         this.blog = blog;
     }

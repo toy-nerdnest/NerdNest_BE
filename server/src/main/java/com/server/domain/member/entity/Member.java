@@ -4,7 +4,7 @@ import com.server.domain.audit.Auditable;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.category.entity.Category;
 import com.server.domain.imageFile.entity.ImageFile;
-import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.entity.Likes;
 import lombok.*;
 
 import javax.persistence.*;
@@ -58,6 +58,6 @@ public class Member extends Auditable {
     private List<Category> categories;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
-    private List<Like> likes;
+    private List<Likes> likes;
 
 }

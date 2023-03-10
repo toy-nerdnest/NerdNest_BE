@@ -3,7 +3,7 @@ package com.server.domain.likes.service;
 
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.service.BlogService;
-import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.entity.Likes;
 import com.server.domain.likes.repository.LikeRepository;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -23,51 +22,51 @@ public class LikeService {
     private final BlogService blogService;
     private final MemberService memberService;
 
-    public Like likeBlogs(Member loginMember, long blogId) {
+    public Likes likeBlogs(Member loginMember, long blogId) {
 
         Member member = memberService.findMember(loginMember.getMemberId());
         Blog blog = blogService.findBlogById(blogId);
 
         // 블로그에 좋아요한 흔적 찾기 -> 없다면 좋아요 누르기, 있다면 status 확인
-        Optional<Like> optionalLike = likeRepository.findByMemberAndBlog(member, blog);
+        Optional<Likes> optionalLike = likeRepository.findByMemberAndBlog(member, blog);
 
-        Like like = null;
+        Likes likes = null;
 
         if(optionalLike.isPresent()) {
-            like = optionalLike.get();
-            return setStatus(like);
+            likes = optionalLike.get();
+            return setStatus(likes);
         } else {
-            like = new Like(member, blog);
-            plusLikeCount(like);
-            return likeRepository.save(like);
+            likes = new Likes(member, blog);
+            plusLikeCount(likes);
+            return likeRepository.save(likes);
         }
 
     }
 
-    private Like setStatus(Like like) {
+    private Likes setStatus(Likes likes) {
 
-        if(like.getLikeStatus() == Like.LikeStatus.LIKE) {
-            like.setLikeStatus(Like.LikeStatus.CANCEL);
-            minusLikeCount(like);
+        if(likes.getLikeStatus() == com.server.domain.likes.entity.Likes.LikeStatus.LIKE) {
+            likes.setLikeStatus(com.server.domain.likes.entity.Likes.LikeStatus.CANCEL);
+            minusLikeCount(likes);
         } else {
-            like.setLikeStatus(Like.LikeStatus.LIKE);
-            plusLikeCount(like);
+            likes.setLikeStatus(com.server.domain.likes.entity.Likes.LikeStatus.LIKE);
+            plusLikeCount(likes);
         }
 
-        return likeRepository.save(like);
+        return likeRepository.save(likes);
     }
 
-    private void plusLikeCount(Like like) {
-        Blog blog = like.getBlog();
+    private void plusLikeCount(Likes likes) {
+        Blog blog = likes.getBlog();
         blog.setLikeCount(blog.getLikeCount()+ 1);
 
-        like.setBlog(blog);
+        likes.setBlog(blog);
     }
-    private void minusLikeCount(Like like) {
-        Blog blog = like.getBlog();
+    private void minusLikeCount(Likes likes) {
+        Blog blog = likes.getBlog();
         blog.setLikeCount(blog.getLikeCount()-1);
 
-        like.setBlog(blog);
+        likes.setBlog(blog);
     }
 
 }

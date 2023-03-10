@@ -5,7 +5,7 @@ import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
-import com.server.domain.likes.entity.Like;
+import com.server.domain.likes.entity.Likes;
 import com.server.domain.likes.repository.LikeRepository;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
@@ -89,7 +89,7 @@ public class BlogService {
     public Page<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
 
-        List<Like> likes = likeRepository.findByMemberAndLikeStatus(member, Like.LikeStatus.LIKE);
+        List<Likes> likes = likeRepository.findByMemberAndLikeStatus(member, com.server.domain.likes.entity.Likes.LikeStatus.LIKE);
 
         List<Blog> blogList = likes.stream()
                         .map(like -> blogRepository.findById(like.getBlog().getBlogId()))

@@ -2,11 +2,8 @@ package com.server.domain.blog.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.domain.comment.dto.CommentResponseDto;
-import com.server.domain.comment.entity.Comment;
-import com.server.domain.likes.entity.Like;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
