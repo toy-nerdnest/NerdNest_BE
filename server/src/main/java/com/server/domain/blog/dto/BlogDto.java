@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 public class BlogDto {
     @Getter
     public static class Post {
-        private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
         private long categoryId;
@@ -23,7 +22,6 @@ public class BlogDto {
     @Setter
     public static class Patch {
         private Long blogId;
-        private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
         private String categoryName;

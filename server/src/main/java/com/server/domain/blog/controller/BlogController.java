@@ -141,7 +141,7 @@ public class BlogController {
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
     }
 
     // 개인 블로그 데이터 전체 게시글 조회
@@ -154,7 +154,7 @@ public class BlogController {
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
 
-        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseDtoWithCategory, blogsPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
     }
 
     @GetMapping("/blogs/edit/{blog-id}")
