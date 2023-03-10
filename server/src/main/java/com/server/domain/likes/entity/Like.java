@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Likes")
 public class Like {
 
     @Id
@@ -35,8 +36,7 @@ public class Like {
         this.member = member;
         this.blog = blog;
     }
-
-
+    @Getter
     public enum LikeStatus {
         LIKE("좋아요"),
         CANCEL("취소");
