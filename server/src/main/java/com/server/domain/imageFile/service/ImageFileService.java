@@ -34,8 +34,10 @@ public class ImageFileService {
     private final AmazonS3Client amazonS3Client;
 
     public ImageFile uploadMemImg(Member member, MultipartFile multipartFile) throws IOException {
-
+        String fileType = multipartFile.getContentType();
+        log.info("image file type: {}", fileType);
         String imageFileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
+        log.info("image file name: {}", imageFileName);
 
         // 업로드할 파일의 사이즈
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -62,8 +64,10 @@ public class ImageFileService {
     }
 
     public ImageFile uploadBlogTitleImg(MultipartFile multipartFile, Member member) throws IOException {
+        String fileType = multipartFile.getContentType();
+        log.info("image file type: {}", fileType);
         String imageFileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
-
+        log.info("image file name: {}", imageFileName);
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(multipartFile.getInputStream().available());
@@ -90,7 +94,7 @@ public class ImageFileService {
 
 //     기본 멤버 프로필 이미지 가져오기
     public String getDefaultMemImgUrl() {
-        String imageFileName = "default-member";
+        String imageFileName = "default-member.png";
         String imageFileUrl = s3EndPoint + "/member/" + imageFileName;
 
         return imageFileUrl;
@@ -98,7 +102,7 @@ public class ImageFileService {
 
 //     기본 썸네일 이미지 가져오기
     public String getDefaultTitleImgUrl() {
-        String imageFileName = "default-title";
+        String imageFileName = "default-title.png";
         String imageFileUrl = s3EndPoint + "/blog/" + imageFileName;
 
         return imageFileUrl;
