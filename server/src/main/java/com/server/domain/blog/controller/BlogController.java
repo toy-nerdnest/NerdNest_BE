@@ -7,11 +7,13 @@ import com.server.domain.blog.mapper.BlogMapper;
 import com.server.domain.blog.service.BlogService;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
+import com.server.domain.comment.dto.CommentResponseDto;
+import com.server.domain.comment.entity.Comment;
+import com.server.domain.comment.service.CommentService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.response.ListResponseDto;
 import com.server.response.MultiResponseDto;
-import com.server.response.PageInfo;
 import com.server.response.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Validated
@@ -36,11 +41,12 @@ public class BlogController {
     private final BlogMapper mapper;
     private final CategoryService categoryService;
     private final MemberService memberService;
+    private final CommentService commentService;
 
     @PostMapping("/blogs")
     public ResponseEntity<HttpStatus> postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
-                                         @AuthenticationPrincipal Member loginMember) {
-        if(loginMember == null) {
+                                               @AuthenticationPrincipal Member loginMember) {
+        if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -56,9 +62,9 @@ public class BlogController {
 
     @PatchMapping("/blogs/edit/{blog-id}")
     public ResponseEntity<HttpStatus> patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
-                                    @PathVariable("blog-id") @Positive long blogId,
-                                    @AuthenticationPrincipal Member loginMember) {
-        if(loginMember == null) {
+                                                @PathVariable("blog-id") @Positive long blogId,
+                                                @AuthenticationPrincipal Member loginMember) {
+        if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -74,8 +80,8 @@ public class BlogController {
 
     @GetMapping("/home/blogs")
     public ResponseEntity<ListResponseDto<?>> getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
-                                          @RequestParam(defaultValue = "1", required = false) int page,
-                                          @RequestParam(defaultValue = "12", required = false) int size) {
+                                                              @RequestParam(defaultValue = "1", required = false) int page,
+                                                              @RequestParam(defaultValue = "12", required = false) int size) {
         //TODO : tab에 따른 likes 정렬기능 추가예정
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
@@ -91,7 +97,7 @@ public class BlogController {
                 sort = "blogId";
                 break;
             case "likes":
-                sort = "likes";
+                sort = "likeCount";
                 break;
         }
         return sort;
@@ -102,7 +108,7 @@ public class BlogController {
                                                    @RequestParam(defaultValue = "12", required = false) int size,
                                                    @AuthenticationPrincipal Member loginMember) {
 
-        if(loginMember == null) {
+        if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -114,7 +120,6 @@ public class BlogController {
         List<Blog> blogs = blogPage.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-
         return new ResponseEntity<>(new MultiResponseDto.BlogList<>(blogResponseHomeDto, blogPage), HttpStatus.OK);
     }
 
@@ -122,15 +127,16 @@ public class BlogController {
     public ResponseEntity<SingleResponseDto<?>> getBlogById(@PathVariable("blog-id") @Positive long blogId) {
         //TODO: Comment 추가 필요
         Blog blog = blogService.findBlogById(blogId);
-        BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
+        List<CommentResponseDto> layeredComments = commentService.getLayeredComments(blog);
+        BlogResponseDto.WithComment blogResponseDtoWithComment = mapper.blogListToBlogResponseDtoWithComment(blog, layeredComments);
 
-        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
+        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDtoWithComment));
     }
 
     @GetMapping("/blogs/category/{category-id}")
     public ResponseEntity<?> getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
-                                                 @RequestParam(required = false, defaultValue = "1") int page,
-                                                 @RequestParam(required = false, defaultValue = "12") int size) {
+                                                    @RequestParam(required = false, defaultValue = "1") int page,
+                                                    @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Blog> blogsPageInfo = blogService.findBlogsByCategoryId(categoryId, page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
@@ -141,8 +147,8 @@ public class BlogController {
     // 개인 블로그 데이터 전체 게시글 조회
     @GetMapping("/blogs/all")
     public ResponseEntity<?> getBlogsByNickname(@RequestParam @NotBlank String nickname,
-                                             @RequestParam(required = false, defaultValue = "1") int page,
-                                             @RequestParam(required = false, defaultValue = "12") int size) {
+                                                @RequestParam(required = false, defaultValue = "1") int page,
+                                                @RequestParam(required = false, defaultValue = "12") int size) {
 
         Page<Blog> blogsPageInfo = blogService.findBlogsByMemberNickname(nickname, page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
@@ -161,8 +167,8 @@ public class BlogController {
 
     @DeleteMapping("/blogs/{blog-id}")
     public ResponseEntity<HttpStatus> deleteBlog(@PathVariable("blog-id") @Positive long blogId,
-                                     @AuthenticationPrincipal Member loginMember) {
-        if(loginMember == null) {
+                                                 @AuthenticationPrincipal Member loginMember) {
+        if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

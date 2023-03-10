@@ -2,6 +2,7 @@ package com.server.domain.blog.entity;
 
 import com.server.domain.audit.Auditable;
 import com.server.domain.category.entity.Category;
+import com.server.domain.comment.entity.Comment;
 import com.server.domain.imageFile.entity.ImageFile;
 import com.server.domain.likes.entity.Like;
 import com.server.domain.member.entity.Member;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import reactor.util.annotation.Nullable;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,8 +38,11 @@ public class Blog extends Auditable {
     @Column(name = "title_image_url")
     private String titleImageUrl;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count", nullable = false, columnDefinition = "integer default 0")
     private int likeCount;
+
+    @Column(name = "comment_count", nullable = false, columnDefinition = "integer default 0")
+    private int commentCount;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -52,4 +58,8 @@ public class Blog extends Auditable {
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
     Set<Like> likes = new HashSet<>();
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
+    List<Comment> commentList = new ArrayList<>();
+
 }

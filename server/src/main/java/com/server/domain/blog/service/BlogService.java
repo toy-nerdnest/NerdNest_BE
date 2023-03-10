@@ -48,6 +48,18 @@ public class BlogService {
         blogRepository.save(dbBlog);
     }
 
+    public void plusBlogCount(Blog blog) {
+        int commentCount = blog.getCommentCount();
+        blog.setCommentCount(commentCount + 1);
+        blogRepository.save(blog);
+    }
+
+    public void minusBlogCount(Blog blog) {
+        int commentCount = blog.getCommentCount();
+        blog.setCommentCount(commentCount - 1);
+        blogRepository.save(blog);
+    }
+
     public Blog findBlogById(Long blogId) {
         return verifyBlogId(blogId);
     }
