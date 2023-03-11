@@ -15,6 +15,7 @@ public class BlogDto {
     public static class Post {
         private String blogTitle;
         private String blogContent;
+        private String titleImageUrl;
         private long categoryId;
     }
 
@@ -24,6 +25,7 @@ public class BlogDto {
         private Long blogId;
         private String blogTitle;
         private String blogContent;
+        private String titleImageUrl;
         private String categoryName;
     }
 }
