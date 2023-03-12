@@ -15,6 +15,7 @@ import com.server.domain.member.service.MemberService;
 import com.server.response.ListResponseDto;
 import com.server.response.MultiResponseDto;
 import com.server.response.SingleResponseDto;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -75,6 +76,7 @@ public class BlogController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /* 홈 화면 데이터 */
     @GetMapping("/home/blogs")
     public ResponseEntity<ListResponseDto<?>> getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
                                                               @RequestParam(defaultValue = "1", required = false) int page,
@@ -99,7 +101,7 @@ public class BlogController {
         }
         return sort;
     }
-
+    /* 홈 화면 데이터 */
     @GetMapping("/home/blogs/mylikes")
     public ResponseEntity getBlogHomeDataByMyLikes(@RequestParam(defaultValue = "1", required = false) int page,
                                                    @RequestParam(defaultValue = "12", required = false) int size,
@@ -120,8 +122,35 @@ public class BlogController {
         return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
     }
 
+    /* 개인 블로그 데이터 */
+    @GetMapping("/blogs/member/{nickname}")
+    public ResponseEntity getPersonalBlogData(@PathVariable("nickname") String nickname,
+                                              @RequestParam(required = false) Long categoryId,
+                                              @RequestParam(defaultValue = "1", required = false) int page,
+                                              @RequestParam(defaultValue = "8", required = false) int size) {
+        log.info("categoryId = {}", categoryId);
+        Member member = memberService.findMember(nickname);
+
+        // categoryId 없으면 멤버가 작성한 모든 블로그 리턴
+        if (categoryId == null) {
+            List<Blog> blogs = blogService.findBlogsByMemberNickname(nickname, page, size).getContent();
+            List<BlogResponseDto.WithCategory> blogResponseHomeDto = mapper.blogListToBlogResponseDtoWithCategory(blogs);
+
+            return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
+        }
+
+        // categoryId 있으면 해당 category에 대한 블로그 내역 리턴
+        List<Blog> blogs = blogService.findBlogsByCategoryId(categoryId, page, size).getContent();
+        List<BlogResponseDto.WithCategory> blogResponseHomeDto = mapper.blogListToBlogResponseDtoWithCategory(blogs);
+
+        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
+    }
+
+
+    /* 블로그 상세 데이터 */
     @GetMapping("/blogs/{blog-id}")
     public ResponseEntity<SingleResponseDto<?>> getBlogById(@PathVariable("blog-id") @Positive long blogId) {
+
         //TODO: Comment 추가 필요
         Blog blog = blogService.findBlogById(blogId);
         List<CommentResponseDto> layeredComments = commentService.getLayeredComments(blog);
@@ -129,6 +158,8 @@ public class BlogController {
 
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDtoWithComment));
     }
+
+
 
     @GetMapping("/blogs/category/{category-id}")
     public ResponseEntity<?> getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
@@ -141,18 +172,7 @@ public class BlogController {
         return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
     }
 
-    // 개인 블로그 데이터 전체 게시글 조회
-    @GetMapping("/blogs/all")
-    public ResponseEntity<?> getBlogsByNickname(@RequestParam @NotBlank String nickname,
-                                                @RequestParam(required = false, defaultValue = "1") int page,
-                                                @RequestParam(required = false, defaultValue = "12") int size) {
 
-        Page<Blog> blogsPageInfo = blogService.findBlogsByMemberNickname(nickname, page, size);
-        List<Blog> blogs = blogsPageInfo.getContent();
-        List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
-
-        return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
-    }
 
     @GetMapping("/blogs/edit/{blog-id}")
     public ResponseEntity<SingleResponseDto<?>> getBlog(@PathVariable("blog-id") @Positive long blogId) {
