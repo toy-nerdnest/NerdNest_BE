@@ -48,19 +48,19 @@ public class BlogController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        //TODO: Comment 추가예정
         Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
 
+        // blogId 리스폰스 데이터 추가
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("blogId", blog.getBlogId());
-        String jsonStr = gson.toJson(jsonObject);
+        String blogIdToJson
+                = gson.toJson(jsonObject);
 
-        return new ResponseEntity<>(jsonStr, HttpStatus.CREATED);
+        return new ResponseEntity<>(blogIdToJson, HttpStatus.CREATED);
     }
 
     @PatchMapping("/blogs/edit/{blog-id}")
@@ -159,30 +159,6 @@ public class BlogController {
         return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, blogResponseHomeDto), HttpStatus.OK);
     }
 
-
-//    @GetMapping("/blogs/member/{nickname}")
-//    public ResponseEntity getPersonalBlogData(@PathVariable("nickname") String nickname,
-//                                              @RequestParam(required = false) Long categoryId,
-//                                              @RequestParam(defaultValue = "1", required = false) int page,
-//                                              @RequestParam(defaultValue = "8", required = false) int size) {
-//        log.info("categoryId = {}", categoryId);
-//        Member member = memberService.findMember(nickname);
-//
-//        // categoryId 없으면 멤버가 작성한 모든 블로그 리턴
-//        if (categoryId == null) {
-//            List<Blog> blogs = blogService.findBlogsByMemberNickname(nickname, page, size).getContent();
-//            List<BlogResponseDto.WithCategory> blogResponseHomeDto = mapper.blogListToBlogResponseDtoWithCategory(blogs);
-//
-//            return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
-//        }
-//
-//        // categoryId 있으면 해당 category에 대한 블로그 내역 리턴
-//        List<Blog> blogs = blogService.findBlogsByCategoryId(categoryId, page, size).getContent();
-//        List<BlogResponseDto.WithCategory> blogResponseHomeDto = mapper.blogListToBlogResponseDtoWithCategory(blogs);
-//
-//        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
-//    }
-
     /* 블로그 상세 데이터 */
     @GetMapping("/blogs/{blog-id}")
     public ResponseEntity<SingleResponseDto<?>> getBlogById(@PathVariable("blog-id") @Positive long blogId) {
@@ -195,7 +171,6 @@ public class BlogController {
         return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDtoWithComment));
     }
 
-
     @GetMapping("/blogs/category/{category-id}")
     public ResponseEntity<?> getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
                                                     @RequestParam(required = false, defaultValue = "1") int page,
@@ -206,7 +181,6 @@ public class BlogController {
 
         return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
     }
-
 
     @GetMapping("/blogs/edit/{blog-id}")
     public ResponseEntity<SingleResponseDto<?>> getBlog(@PathVariable("blog-id") @Positive long blogId) {
