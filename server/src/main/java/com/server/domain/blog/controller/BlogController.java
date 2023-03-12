@@ -1,5 +1,8 @@
 package com.server.domain.blog.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.server.domain.blog.dto.BlogDto;
 import com.server.domain.blog.dto.BlogResponseDto;
 import com.server.domain.blog.entity.Blog;
@@ -42,7 +45,7 @@ public class BlogController {
     private final CommentService commentService;
 
     @PostMapping("/blogs")
-    public ResponseEntity<HttpStatus> postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
+    public ResponseEntity<?> postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
                                                @AuthenticationPrincipal Member loginMember) {
         if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
@@ -55,7 +58,13 @@ public class BlogController {
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("blogId", blog.getBlogId());
+        String jsonStr = gson.toJson(jsonObject);
+
+        return new ResponseEntity<>(jsonStr,HttpStatus.CREATED);
     }
 
     @PatchMapping("/blogs/edit/{blog-id}")
