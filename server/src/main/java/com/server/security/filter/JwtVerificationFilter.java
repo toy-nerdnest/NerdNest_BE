@@ -1,8 +1,11 @@
 package com.server.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
+import com.server.response.ErrorResponse;
 import com.server.security.JwtTokenizer;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
@@ -12,6 +15,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SignatureException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +46,11 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         try{
             Map<String, Object> claims = verifyJws(request);
             setAuthenticationToContext(claims);
+            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
+            sendErrorResponse(response);
+            log.info("기간이 만료된 토큰입니다.");
         } catch (Exception e) {
             request.setAttribute("exception", e);
         }
@@ -63,6 +72,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         if(StringUtils.hasText(redisService.getAccessToken(jws))) {
             throw new UnsupportedJwtException("로그아웃 된 토큰입니다.");
         }
+
+        validTokenExpiration(jws);
 
         String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
         Map<String, Object> claims = jwtTokenizer.getClaims(jws, base64EncodedSecretKey).getBody();
@@ -89,5 +100,22 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
 
         log.info("Set Authentication in security context : {}", authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private void validTokenExpiration(String jwt) {
+        long expiration = jwtTokenizer.getExpiration(jwt);
+
+        if(expiration <= 0) {
+            log.info("Access Token 기간 만료!");
+            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+        }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response) throws IOException {
+        Gson gson = new Gson();
+        ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
     }
 }

@@ -1,6 +1,5 @@
 package com.server.config;
 
-import com.server.domain.member.service.MemberService;
 import com.server.security.JwtTokenizer;
 import com.server.security.filter.JwtAuthenticationFilter;
 import com.server.security.filter.JwtVerificationFilter;
@@ -14,7 +13,6 @@ import com.server.security.service.AuthService;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +28,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -79,7 +76,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-//        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://15.164.185.150:8080", "http://nerdnest.s3-website.ap-northeast-2.amazonaws.com:3000" ));
+//        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://15.164.185.150:8080", "http://nerdnest.s3-website.ap-northeast-2.amazonaws.com" ));
         corsConfiguration.addAllowedOriginPattern("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
@@ -108,6 +105,7 @@ public class SecurityConfig {
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
 
             builder.addFilter(jwtAuthenticationFilter) // 인증 시도 필터
+                    .addFilterBefore(jwtVerificationFilter, JwtAuthenticationFilter.class)
                     .addFilterAfter(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class); // 토큰 검증 필터
         }
     }
