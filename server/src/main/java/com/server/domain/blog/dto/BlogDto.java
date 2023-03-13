@@ -13,18 +13,20 @@ import javax.validation.constraints.NotNull;
 public class BlogDto {
     @Getter
     public static class Post {
+        @NotBlank(message = "제목을 필수로 입력해주세요")
         private String blogTitle;
         private String blogContent;
         private String titleImageUrl;
         @NotNull(message = "categoryId를 입력해주세요")
-        private long categoryId;
+        private Long categoryId;
     }
 
     @Getter
     @Setter
     public static class Patch {
-        @NotBlank(message = "blogId를 입력해주세요")
+        @NotNull(message = "blogId를 입력해주세요")
         private Long blogId;
+        @NotBlank(message = "제목을 필수로 입력해주세요")
         private String blogTitle;
         private String blogContent;
         private String titleImageUrl;

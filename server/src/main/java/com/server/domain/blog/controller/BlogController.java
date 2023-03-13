@@ -40,6 +40,7 @@ public class BlogController {
     private final MemberService memberService;
     private final CommentService commentService;
 
+    /* 블로그 등록 */
     @PostMapping("/blogs")
     public ResponseEntity<?> postBlog(@RequestBody @Valid BlogDto.Post blogPostDto,
                                       @AuthenticationPrincipal Member loginMember) {
@@ -63,6 +64,7 @@ public class BlogController {
         return new ResponseEntity<>(blogIdToJson, HttpStatus.CREATED);
     }
 
+    /* 블로그 수정 */
     @PatchMapping("/blogs/edit/{blog-id}")
     public ResponseEntity<HttpStatus> patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
                                                 @PathVariable("blog-id") @Positive long blogId,
@@ -81,12 +83,20 @@ public class BlogController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /* 홈 화면 데이터 */
+    /* 블로그 조회 */
+    @GetMapping("/blogs/edit/{blog-id}")
+    public ResponseEntity<SingleResponseDto<?>> getBlog(@PathVariable("blog-id") @Positive long blogId) {
+        Blog blog = blogService.findBlogById(blogId);
+        BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
+
+        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
+    }
+
+    /* 홈 화면 데이터 - 추천순, 최신순 */
     @GetMapping("/home/blogs")
     public ResponseEntity<ListResponseDto<?>> getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
                                                               @RequestParam(defaultValue = "1", required = false) int page,
                                                               @RequestParam(defaultValue = "12", required = false) int size) {
-        //TODO : tab에 따른 likes 정렬기능 추가예정
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
@@ -107,7 +117,7 @@ public class BlogController {
         return sort;
     }
 
-    /* 홈 화면 데이터 */
+    /* 홈 화면 데이터 - 내추천 */
     @GetMapping("/home/blogs/mylikes")
     public ResponseEntity getBlogHomeDataByMyLikes(@RequestParam(defaultValue = "1", required = false) int page,
                                                    @RequestParam(defaultValue = "12", required = false) int size,
@@ -128,7 +138,7 @@ public class BlogController {
         return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
     }
 
-    /* 개인 블로그 데이터 */
+    /* 멤버 개인 블로그 데이터 */
     @GetMapping("/blogs/member/{nickname}")
     public ResponseEntity getPersonalBlogData(@PathVariable("nickname") String nickname,
                                               @RequestParam(required = false) Long categoryId,
@@ -156,42 +166,23 @@ public class BlogController {
         boolean isNextPage = blogService.judgeNextPage(page, totalPages);
 
         List<Blog> blogs = blogsByCategoryId.getContent();
-        List<BlogResponseDto.WithCategory> blogResponseHomeDto = mapper.blogListToBlogResponseDtoWithCategory(blogs);
+        List<BlogResponseDto.Member> blogResponseMemberDtos = mapper.blogListToBlogResponseMemberDto(blogs);
 
-        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, blogResponseHomeDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, blogResponseMemberDtos), HttpStatus.OK);
     }
 
     /* 블로그 상세 데이터 */
     @GetMapping("/blogs/{blog-id}")
     public ResponseEntity<SingleResponseDto<?>> getBlogById(@PathVariable("blog-id") @Positive long blogId) {
 
-        //TODO: Comment 추가 필요
         Blog blog = blogService.findBlogById(blogId);
         List<CommentResponseDto> layeredComments = commentService.getLayeredComments(blog);
-        BlogResponseDto.WithComment blogResponseDtoWithComment = mapper.blogListToBlogResponseDtoWithComment(blog, layeredComments);
+        BlogResponseDto.Detail blogResponseDtoDetail = mapper.blogListToBlogDetailResponseDtoWithComment(blog, layeredComments);
 
-        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDtoWithComment));
+        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDtoDetail));
     }
 
-    @GetMapping("/blogs/category/{category-id}")
-    public ResponseEntity<?> getBlogsByCategoryName(@PathVariable("category-id") long categoryId,
-                                                    @RequestParam(required = false, defaultValue = "1") int page,
-                                                    @RequestParam(required = false, defaultValue = "12") int size) {
-        Page<Blog> blogsPageInfo = blogService.findBlogsByCategoryId(categoryId, page, size);
-        List<Blog> blogs = blogsPageInfo.getContent();
-        List<BlogResponseDto.WithCategory> blogResponseDtoWithCategory = mapper.blogListToBlogResponseDtoWithCategory(blogs);
-
-        return new ResponseEntity<>(new ListResponseDto<>(blogResponseDtoWithCategory), HttpStatus.OK);
-    }
-
-    @GetMapping("/blogs/edit/{blog-id}")
-    public ResponseEntity<SingleResponseDto<?>> getBlog(@PathVariable("blog-id") @Positive long blogId) {
-        Blog blog = blogService.findBlogById(blogId);
-        BlogResponseDto blogResponseDto = mapper.blogToBlogResponseDto(blog);
-
-        return ResponseEntity.ok(new SingleResponseDto<>(blogResponseDto));
-    }
-
+    /* 블로그 상세 데이터 - 삭제 */
     @DeleteMapping("/blogs/{blog-id}")
     public ResponseEntity<HttpStatus> deleteBlog(@PathVariable("blog-id") @Positive long blogId,
                                                  @AuthenticationPrincipal Member loginMember) {
@@ -206,6 +197,7 @@ public class BlogController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /* 검색 페이지 */
     @GetMapping("/search")
     public ResponseEntity searchBlog(@RequestParam(required = false) String keyword,
                                      @RequestParam(defaultValue = "1") int page,

@@ -11,34 +11,25 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BlogMapper {
+
+    /* 블로그 등록 */
     @Mapping(target = "category", source = "category")
     Blog blogPostDtoToBlog(BlogDto.Post blogPostDto, Category category, Member member);
+
+    /* 블로그 수정 */
     @Mapping(target = "category", source = "category")
     Blog blogPatchDtoToBlog(BlogDto.Patch blogPatchDto, Category category);
-//    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
+
+    /* 블로그 조회 */
     @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
     BlogResponseDto blogToBlogResponseDto(Blog blog);
 
-    default List<BlogResponseDto.WithCategory> blogListToBlogResponseDtoWithCategory(List<Blog> blogs) {
-        return blogs.stream().map(blog -> {
-            return BlogResponseDto.WithCategory.builder()
-                    .blogId(blog.getBlogId())
-                    .titleImageUrl(blog.getTitleImageUrl())
-                    .blogTitle(blog.getBlogTitle())
-                    .createdAt(blog.getCreatedAt())
-                    .modifiedAt(blog.getModifiedAt())
-                    .likeCount(blog.getLikeCount())
-                    .commentCount(blog.getCommentCount())
-                    .build();
-        }).collect(Collectors.toList());
-    }
-
+    /* 홈 화면 데이터 */
     default List<BlogResponseDto.Home> blogListToBlogResponseHomeDto(List<Blog> blogs) {
         return blogs.stream().map(blog -> {
             return BlogResponseDto.Home.builder()
@@ -56,14 +47,12 @@ public interface BlogMapper {
 
     }
 
-    default BlogResponseDto.WithComment blogListToBlogResponseDtoWithComment(Blog blog, List<CommentResponseDto> commentResponseDtos) {
-        return BlogResponseDto.WithComment.builder()
-                .titleImageUrl(blog.getTitleImageUrl())
-                .blogTitle(blog.getBlogTitle())
-                .createdAt(blog.getCreatedAt())
-                .categoryId(blog.getCategory().getCategoryId())
-                .commentList(commentResponseDtos)
-                .build();
-    }
+    /* 멤버 개인 블로그 데이터 */
+    List<BlogResponseDto.Member> blogListToBlogResponseMemberDto(List<Blog> blogs);
+
+    /* 블로그 상세 데이터 */
+    @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
+    @Mapping(target = "commentList", source = "commentResponseDtos")
+    BlogResponseDto.Detail blogListToBlogDetailResponseDtoWithComment(Blog blog, List<CommentResponseDto> commentResponseDtos);
 
 }
