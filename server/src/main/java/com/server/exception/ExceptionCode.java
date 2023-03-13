@@ -32,7 +32,10 @@ public enum ExceptionCode {
 
     /* IMAGE */
     IMAGE_FILE_NOT_FONUD(404, "Image file not found"),
-    INVALID_TOKEN(400, "Invalid token");
+    INVALID_TOKEN(400, "Invalid token"),
+
+    /* PAGE */
+    INVALID_PAGE(400, "Invalid page");
 
     @Getter
     private int status;

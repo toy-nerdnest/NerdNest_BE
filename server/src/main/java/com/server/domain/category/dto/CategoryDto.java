@@ -1,6 +1,8 @@
 package com.server.domain.category.dto;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class CategoryDto {

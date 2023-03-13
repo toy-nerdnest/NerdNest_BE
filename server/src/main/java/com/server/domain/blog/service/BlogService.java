@@ -135,4 +135,15 @@ public class BlogService {
         }
     }
 
+    public boolean judgeNextPage(int curPage, int totalPage) {
+        if (curPage > totalPage) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PAGE);
+        }
+
+        if (curPage == totalPage) {
+            return false;
+        }
+        return true;
+    }
+
 }
