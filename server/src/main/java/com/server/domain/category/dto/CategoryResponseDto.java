@@ -1,11 +1,8 @@
 package com.server.domain.category.dto;
 
 import com.server.domain.blog.dto.BlogResponseDto;
-import com.server.domain.blog.entity.Blog;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -18,7 +15,7 @@ public class CategoryResponseDto {
     @Data
     @Builder
     public static class Single {
-        private List<BlogResponseDto.WithCategory> blogList;
+        private List<BlogResponseDto.Member> blogList;
     }
 
 }

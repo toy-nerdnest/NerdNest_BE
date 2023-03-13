@@ -22,7 +22,7 @@ public interface CategoryMapper {
     default CategoryResponseDto.Single categoryToCategorySingleResponseDto(List<Blog> blogs) {
         return CategoryResponseDto.Single.builder()
                 .blogList(blogs.stream().map(blog -> {
-                    return BlogResponseDto.WithCategory.builder()
+                    return BlogResponseDto.Member.builder()
                             .blogId(blog.getBlogId())
                             .titleImageUrl(blog.getTitleImageUrl())
                             .blogTitle(blog.getBlogTitle())
