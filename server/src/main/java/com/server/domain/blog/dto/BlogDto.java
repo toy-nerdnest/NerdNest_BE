@@ -16,19 +16,16 @@ public class BlogDto {
         private String blogTitle;
         private String blogContent;
         private String titleImageUrl;
-        @NotBlank(message = "categoryId를 입력해주세요")
         private Long categoryId;
     }
 
     @Getter
     @Setter
     public static class Patch {
-        @NotBlank(message = "blogId를 입력해주세요")
         private Long blogId;
         private String blogTitle;
         private String blogContent;
         private String titleImageUrl;
-        @NotBlank(message = "categoryId를 입력해주세요")
         private Long categoryId;
     }
 }
