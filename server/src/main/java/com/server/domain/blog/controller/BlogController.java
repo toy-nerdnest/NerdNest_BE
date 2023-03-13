@@ -97,7 +97,6 @@ public class BlogController {
     public ResponseEntity<ListResponseDto<?>> getBlogHomeData(@RequestParam(defaultValue = "newest", required = false) String tab,
                                                               @RequestParam(defaultValue = "1", required = false) int page,
                                                               @RequestParam(defaultValue = "12", required = false) int size) {
-        //TODO : tab에 따른 likes 정렬기능 추가예정
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
         List<Blog> blogs = blogsPageInfo.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);

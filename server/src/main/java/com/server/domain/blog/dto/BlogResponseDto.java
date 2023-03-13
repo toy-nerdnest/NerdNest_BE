@@ -56,6 +56,7 @@ public class BlogResponseDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 hh시 mm분", timezone = "Asia/Seoul")
         private LocalDateTime modifiedAt;
         private Long categoryId;
+        private int commentCount;
         private List<CommentResponseDto> commentList;
     }
 

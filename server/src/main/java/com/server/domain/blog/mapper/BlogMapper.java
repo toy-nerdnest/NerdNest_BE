@@ -52,6 +52,7 @@ public interface BlogMapper {
 
     /* 블로그 상세 데이터 */
     @Mapping(target = "categoryId", expression = "java(blog.getCategory().getCategoryId())")
+    @Mapping(target = "commentList", source = "commentResponseDtos")
     BlogResponseDto.Detail blogListToBlogDetailResponseDtoWithComment(Blog blog, List<CommentResponseDto> commentResponseDtos);
 
 }

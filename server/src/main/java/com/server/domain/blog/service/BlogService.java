@@ -56,8 +56,11 @@ public class BlogService {
 
     public void minusBlogCount(Blog blog) {
         int commentCount = blog.getCommentCount();
-        blog.setCommentCount(commentCount - 1);
-        blogRepository.save(blog);
+
+        if (commentCount > 0) {
+            blog.setCommentCount(commentCount - 1);
+            blogRepository.save(blog);
+        }
     }
 
     public Blog findBlogById(Long blogId) {
