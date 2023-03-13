@@ -137,8 +137,10 @@ public class BlogController {
         log.info("categoryId = {}", categoryId);
         Member member = memberService.findMember(nickname);
 
+        Category singleCategoryById = categoryService.findSingleCategoryById(categoryId);
+
         // categoryId 없으면 멤버가 작성한 모든 블로그 리턴
-        if (categoryId == null) {
+        if (categoryId == null || singleCategoryById.getCategoryName().equals("전체")) {
             Page<Blog> blogsByMemberNickname = blogService.findBlogsByMemberNickname(nickname, page, size);
             return getResponseEntity(page, blogsByMemberNickname);
         }
