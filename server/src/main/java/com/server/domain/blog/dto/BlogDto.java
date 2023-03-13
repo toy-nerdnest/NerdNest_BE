@@ -17,7 +17,7 @@ public class BlogDto {
         private String blogContent;
         private String titleImageUrl;
         @NotBlank(message = "categoryId를 입력해주세요")
-        private long categoryId;
+        private Long categoryId;
     }
 
     @Getter
