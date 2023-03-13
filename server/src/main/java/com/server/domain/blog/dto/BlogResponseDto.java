@@ -11,18 +11,14 @@ import java.util.List;
 @Data
 @Builder
 public class BlogResponseDto {
-
     private String titleImageUrl;
     private String blogTitle;
     private String blogContent;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일", timezone = "Asia/Seoul")
-    private LocalDateTime createdAt;
     private Long categoryId;
-//    private List<CommentResponseDto> commentList;
 
-    @Builder
     @Data
-    public static class WithCategory {
+    @Builder
+    public static class Member {
         private long blogId;
         private String titleImageUrl;
         private String blogTitle;
@@ -34,8 +30,8 @@ public class BlogResponseDto {
         private int commentCount;
     }
 
-    @Builder
     @Data
+    @Builder
     public static class Home {
         private Long memberId;
         private Long blogId;
@@ -51,12 +47,14 @@ public class BlogResponseDto {
 
     @Builder
     @Data
-    public static class WithComment {
+    public static class Detail {
         private String titleImageUrl;
         private String blogTitle;
         private String blogContent;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 hh시 mm분", timezone = "Asia/Seoul")
         private LocalDateTime createdAt;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 hh시 mm분", timezone = "Asia/Seoul")
+        private LocalDateTime modifiedAt;
         private Long categoryId;
         private List<CommentResponseDto> commentList;
     }
