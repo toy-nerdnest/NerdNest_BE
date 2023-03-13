@@ -74,7 +74,7 @@ public class BlogController {
 
         blogService.verifyOwner(blogId, loginMember);
         blogPatchDto.setBlogId(blogId);
-        Category singleCategory = categoryService.findSingleCategoryByName(blogPatchDto.getCategoryName());
+        Category singleCategory = categoryService.findSingleCategoryById(blogPatchDto.getCategoryId());
         Blog blog = mapper.blogPatchDtoToBlog(blogPatchDto, singleCategory);
         blogService.editBlog(blog);
 
