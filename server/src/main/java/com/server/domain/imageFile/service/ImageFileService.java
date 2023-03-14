@@ -1,13 +1,10 @@
 package com.server.domain.imageFile.service;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.server.domain.imageFile.entity.ImageFile;
 import com.server.domain.imageFile.repository.ImageFileRepository;
 import com.server.domain.member.entity.Member;
-import com.server.exception.BusinessLogicException;
-import com.server.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
