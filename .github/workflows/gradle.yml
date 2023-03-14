@@ -54,6 +54,7 @@ jobs:
         GOOGLE_OAUTH_ID: ${{secrets.GOOGLE_OAUTH_ID}}
         GOOGLE_OAUTH_PW: ${{secrets.GOOGLE_OAUTH_PW}}
         KAKAO_OAUTH_ID: ${{secrets.KAKAO_OAUTH_ID}}
+        KAKAO_OAUTH_PW: ${{secrets.KAKAO_OAUTH_PW}}
         
       run: |
         echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> src/main/resources/env.yml
@@ -73,6 +74,7 @@ jobs:
         echo "GOOGLE_OAUTH_ID=$GOOGLE_OAUTH_ID" >> src/main/resources/env.yml
         echo "GOOGLE_OAUTH_PW=$GOOGLE_OAUTH_PW" >> src/main/resources/env.yml
         echo "KAKAO_OAUTH_ID=$KAKAO_OAUTH_ID" >> src/main/resources/env.yml
+        echo "KAKAO_OAUTH_PW=$KAKAO_OAUTH_PW" >> src/main/resources/env.yml
         
     - name: Build with Gradle
       run: ./gradlew build
