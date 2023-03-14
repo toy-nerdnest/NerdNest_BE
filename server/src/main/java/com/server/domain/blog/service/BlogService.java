@@ -34,7 +34,7 @@ public class BlogService {
 
     public void createBlog(Blog blog) {
 
-        if(blog.getTitleImageUrl() == null) {
+        if(blog.getTitleImageUrl().isEmpty()) {
             blog.setTitleImageUrl(imageFileService.getDefaultTitleImgUrl());
             log.info("Blog Title Image : 기본 이미지 저장 완료");
         }
