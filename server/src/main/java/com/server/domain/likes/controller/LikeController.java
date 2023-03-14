@@ -24,7 +24,7 @@ public class LikeController {
 
     @PostMapping("/blogs/{blog-Id}/likes")
     public ResponseEntity insert(@AuthenticationPrincipal Member loginMember,
-                                 @Positive @PathVariable("blog-Id") Long blogId) {
+                                 @Positive @PathVariable("blog-Id") long blogId) {
 
         if(loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");

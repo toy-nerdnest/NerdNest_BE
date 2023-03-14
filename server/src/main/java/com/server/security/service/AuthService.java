@@ -1,11 +1,9 @@
 package com.server.security.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
 import com.server.exception.ExceptionCode;
 import com.server.security.JwtTokenizer;
-import com.server.security.utils.MemberAuthorityUtils;
 import com.server.security.utils.MemberDetails;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

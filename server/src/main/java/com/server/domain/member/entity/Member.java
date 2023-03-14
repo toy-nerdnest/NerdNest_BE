@@ -1,5 +1,6 @@
 package com.server.domain.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.server.domain.audit.Auditable;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.category.entity.Category;
@@ -52,12 +53,14 @@ public class Member extends Auditable {
     private ImageFile imageFile;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @JsonIgnore
     private List<Blog> blogs;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
     private List<Category> categories;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @JsonIgnore
     private List<Likes> likes;
 
 }
