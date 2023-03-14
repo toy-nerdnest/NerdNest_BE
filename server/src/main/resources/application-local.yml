@@ -67,11 +67,5 @@ cloud:
     stack:
       auto: false
 
-logging:
-  level:
-    org:
-      springframework:
-        orm:
-          jpa: DEBUG
 
 
