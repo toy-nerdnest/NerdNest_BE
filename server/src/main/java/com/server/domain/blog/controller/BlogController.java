@@ -98,10 +98,7 @@ public class BlogController {
                                                               @RequestParam(defaultValue = "1", required = false) int page,
                                                               @RequestParam(defaultValue = "12", required = false) int size) {
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
-        List<Blog> blogs = blogsPageInfo.getContent();
-        List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
-
-        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
+        return getHomeResponseEntity(page, blogsPageInfo);
     }
 
     private static String switchTabToSort(String tab) {
@@ -131,11 +128,15 @@ public class BlogController {
         Member member = memberService.findMember(loginMember.getMemberId());
 
         Page<Blog> blogPage = blogService.findBlogsByMemberWithLike(member, page, size);
+        return getHomeResponseEntity(page, blogPage);
+    }
 
+    private ResponseEntity getHomeResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogPage) {
+        boolean isNextPage = blogService.judgeNextPage(page, blogPage);
         List<Blog> blogs = blogPage.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity<>(new ListResponseDto<>(blogResponseHomeDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage,blogResponseHomeDto), HttpStatus.OK);
     }
 
     /* 멤버 개인 블로그 데이터 */
@@ -152,19 +153,17 @@ public class BlogController {
         // categoryId 없으면 멤버가 작성한 모든 블로그 리턴
         if (categoryId == null || singleCategoryById.getCategoryName().equals("전체")) {
             Page<Blog> blogsByMemberNickname = blogService.findBlogsByMemberNickname(nickname, page, size);
-            return getResponseEntity(page, blogsByMemberNickname);
+            return getMemberBlogResponseEntity(page, blogsByMemberNickname);
         }
 
         // categoryId 있으면 해당 category에 대한 블로그 내역 리턴
         Page<Blog> blogsByCategoryId = blogService.findBlogsByCategoryId(categoryId, page, size);
-        return getResponseEntity(page, blogsByCategoryId);
+        return getMemberBlogResponseEntity(page, blogsByCategoryId);
     }
 
     // 무한스크롤에 대한 isNextPage true false 여부 리스폰스 추가
-    private ResponseEntity getResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogsByCategoryId) {
-        int totalPages = blogsByCategoryId.getTotalPages();
-        boolean isNextPage = blogService.judgeNextPage(page, totalPages);
-
+    private ResponseEntity getMemberBlogResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogsByCategoryId) {
+        boolean isNextPage = blogService.judgeNextPage(page, blogsByCategoryId);
         List<Blog> blogs = blogsByCategoryId.getContent();
         List<BlogResponseDto.Member> blogResponseMemberDtos = mapper.blogListToBlogResponseMemberDto(blogs);
 
@@ -203,9 +202,10 @@ public class BlogController {
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "12") int size) {
         Page<Blog> pageBlogs = blogService.searchBlog(keyword, page, size);
+        boolean isNextPage = blogService.judgeNextPage(page, pageBlogs);
         List<Blog> blogs = pageBlogs.getContent();
         List<BlogResponseDto.Home> responses = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity<>(new MultiResponseDto.BlogList<>(responses, pageBlogs), HttpStatus.OK);
+        return new ResponseEntity<>(new ScrollResponseDto(isNextPage, responses), HttpStatus.OK);
     }
 }
