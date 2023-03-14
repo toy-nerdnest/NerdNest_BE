@@ -66,8 +66,3 @@ cloud:
       static: ${S3_REGION}
     stack:
       auto: false
-
-logging:
-  level:
-    org.hibernate.sql: debug
-    root: info
