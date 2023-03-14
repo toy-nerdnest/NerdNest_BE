@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class BlogService {
     private final BlogRepository blogRepository;
     private final CustomBeanUtils beanUtils;
@@ -118,9 +120,9 @@ public class BlogService {
     }
 
     public Page<Blog> searchBlog(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1, size, Sort.by("blogId").descending());
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
         log.info("search keyword : {}", keyword);
-        Page<Blog> blogs = blogRepository.findByBlogTitleContaining(keyword, pageable);
+        Page<Blog> blogs = blogRepository.findAllByBlogTitleIsContainingIgnoreCase(keyword, pageable);
 
         return blogs;
     }
@@ -138,12 +140,13 @@ public class BlogService {
         }
     }
 
-    public boolean judgeNextPage(int curPage, int totalPage) {
-        if (curPage > totalPage) {
+    public boolean judgeNextPage(int curPage, Page<Blog> blogPage) {
+        int totalPages = blogPage.getTotalPages();
+        if (curPage > totalPages) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PAGE);
         }
 
-        if (curPage == totalPage) {
+        if (curPage == totalPages) {
             return false;
         }
         return true;
