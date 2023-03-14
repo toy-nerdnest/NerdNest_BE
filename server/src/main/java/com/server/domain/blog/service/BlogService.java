@@ -120,9 +120,9 @@ public class BlogService {
     }
 
     public Page<Blog> searchBlog(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1, size, Sort.by("blogId").descending());
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
         log.info("search keyword : {}", keyword);
-        Page<Blog> blogs = blogRepository.findByBlogTitleContaining(keyword, pageable);
+        Page<Blog> blogs = blogRepository.findAllByBlogTitleIsContainingIgnoreCase(keyword, pageable);
 
         return blogs;
     }

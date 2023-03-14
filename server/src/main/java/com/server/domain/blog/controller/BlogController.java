@@ -54,7 +54,6 @@ public class BlogController {
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
 
-        // blogId 리스폰스 데이터 추가
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("blogId", blog.getBlogId());
@@ -199,8 +198,8 @@ public class BlogController {
     /* 검색 페이지 */
     @GetMapping("/search")
     public ResponseEntity searchBlog(@RequestParam(required = false) String keyword,
-                                     @RequestParam(defaultValue = "1") int page,
-                                     @RequestParam(defaultValue = "12") int size) {
+                                     @RequestParam(defaultValue = "1", required = false) int page,
+                                     @RequestParam(defaultValue = "12", required = false) int size) {
         Page<Blog> pageBlogs = blogService.searchBlog(keyword, page, size);
         boolean isNextPage = blogService.judgeNextPage(page, pageBlogs);
         List<Blog> blogs = pageBlogs.getContent();
