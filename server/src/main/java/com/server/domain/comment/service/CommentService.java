@@ -61,10 +61,6 @@ public class CommentService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.COMMENT_NOT_FOUND));
     }
 
-    public Long countAllCommentsByPost(Blog blog) {
-        return commentRepository.countByBlog(blog);
-    }
-
     public void verifyOwner(long commentId, Member loginMember) {
         Long loginMemberId = loginMember.getMemberId();
         Long ownerId = findComment(commentId).getMember().getMemberId();
