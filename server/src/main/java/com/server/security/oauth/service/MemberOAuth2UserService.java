@@ -8,6 +8,7 @@ import com.server.security.oauth.utils.OAuthAttributes;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,11 +19,12 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -30,6 +32,14 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final MemberRepository memberRepository;
     private final MemberAuthorityUtils authorityUtils;
     private final PasswordEncoder passwordEncoder;
+
+    public MemberOAuth2UserService(MemberRepository memberRepository,
+                                   MemberAuthorityUtils authorityUtils,
+                                   @Lazy PasswordEncoder passwordEncoder) {
+        this.memberRepository = memberRepository;
+        this.authorityUtils = authorityUtils;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
