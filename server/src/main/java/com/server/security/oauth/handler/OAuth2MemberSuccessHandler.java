@@ -1,5 +1,6 @@
 package com.server.security.oauth.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.security.JwtTokenizer;
@@ -57,6 +58,7 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), body);
 
         String uri = createURI(memberId).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
