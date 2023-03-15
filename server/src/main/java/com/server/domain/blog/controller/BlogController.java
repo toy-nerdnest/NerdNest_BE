@@ -164,8 +164,7 @@ public class BlogController {
 
     // 무한스크롤에 대한 isNextPage true false 여부 리스폰스 추가
     private ResponseEntity getResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogPages) {
-        int totalPages = blogPages.getTotalPages();
-        boolean isNextPage = blogService.judgeNextPage(page, totalPages);
+        boolean isNextPage = blogService.judgeNextPage(page, blogPages);
 
         List<Blog> blogs = blogPages.getContent();
         List<BlogResponseDto.Member> blogResponseMemberDtos = mapper.blogListToBlogResponseMemberDto(blogs);
