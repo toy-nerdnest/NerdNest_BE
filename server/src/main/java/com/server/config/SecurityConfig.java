@@ -59,10 +59,10 @@ public class SecurityConfig {
                 .apply(new MemberFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
-                .oauth2Login()
-                .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, redisService)) // token 리다이렉트
-                .userInfoEndpoint()
-                .userService(memberOAuth2UserService); // 유저정보 저장
+                .oauth2Login(oauth -> oauth
+                        .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, redisService)) // token 리다이렉트
+                        .userInfoEndpoint()
+                        .userService(memberOAuth2UserService));
 
         return http.build();
     }
@@ -105,7 +105,7 @@ public class SecurityConfig {
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
 
             builder.addFilter(jwtAuthenticationFilter) // 인증 시도 필터
-                    .addFilterBefore(jwtVerificationFilter, JwtAuthenticationFilter.class)
+                    .addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
                     .addFilterAfter(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class); // 토큰 검증 필터
         }
     }
