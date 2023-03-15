@@ -19,6 +19,7 @@ public interface BlogMapper {
 
     /* 블로그 등록 */
     @Mapping(target = "category", source = "category")
+    @Mapping(target = "member", source = "member")
     Blog blogPostDtoToBlog(BlogDto.Post blogPostDto, Category category, Member member);
 
     /* 블로그 수정 */

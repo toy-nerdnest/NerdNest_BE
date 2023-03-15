@@ -2,7 +2,6 @@ package com.server.domain.member.service;
 
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.repository.CategoryRepository;
-import com.server.domain.category.service.CategoryService;
 import com.server.domain.imageFile.service.ImageFileService;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
@@ -15,9 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 

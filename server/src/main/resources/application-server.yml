@@ -35,7 +35,8 @@ spring:
               - profile
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
-            redirect-uri: http://ec2-15-164-185-150.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/kakao # 도메인 변경
+            client-secret: ${KAKAO_OAUTH_PW}
+            redirect-uri: http://15.164.185.150:8080/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope: profile_nickname, profile_image, account_emil
@@ -66,4 +67,3 @@ cloud:
       static: ${S3_REGION}
     stack:
       auto: false
-

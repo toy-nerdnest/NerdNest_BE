@@ -1,6 +1,5 @@
 package com.server.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
@@ -14,7 +13,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,8 +27,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.SignatureException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +42,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         try{
             Map<String, Object> claims = verifyJws(request);
             setAuthenticationToContext(claims);
-            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
             sendErrorResponse(response);
