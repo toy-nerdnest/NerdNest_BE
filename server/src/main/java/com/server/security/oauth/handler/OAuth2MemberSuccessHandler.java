@@ -39,20 +39,16 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         String email = String.valueOf(oAuth2User.getAttributes().get("email"));
         List<String> authorities = authorityUtils.createRole();
 
-        Member member = (Member) authentication.getPrincipal();
-        long memberId = member.getMemberId();
-        log.info("memberId :{}", memberId);
-
-        redirect(request, response, email, authorities, memberId);
+        redirect(request, response, email, authorities);
         log.info("OAuth2 Login Success");
     }
 
-    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities, long memberId) throws IOException {
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities) throws IOException {
         String accessToken = delegateAccessToken(email, authorities);
         String refreshToken = delegateRefreshToken(email);
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("memberId", memberId);
+        body.put("email", email);
         body.put("accessToken", "Bearer "+ accessToken);
         body.put("refreshToken", refreshToken);
 
@@ -60,7 +56,7 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), body);
 
-        String uri = createURI(memberId).toString();
+        String uri = createURI(email).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
@@ -94,9 +90,9 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return refreshToken;
     }
 
-    private URI createURI(long memberId) {
+    private URI createURI(String email) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("memberId", String.valueOf(memberId));
+        queryParams.add("email", email);
 
         return UriComponentsBuilder
                 .newInstance()
