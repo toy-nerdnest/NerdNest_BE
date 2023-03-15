@@ -8,6 +8,8 @@ import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -36,15 +38,27 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         String email = String.valueOf(oAuth2User.getAttributes().get("email"));
         List<String> authorities = authorityUtils.createRole();
 
-        redirect(request, response, email, authorities);
+        Member member = (Member) authentication.getPrincipal();
+        long memberId = member.getMemberId();
+        log.info("memberId :{}", memberId);
+
+        redirect(request, response, email, authorities, memberId);
         log.info("OAuth2 Login Success");
     }
 
-    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities) throws IOException {
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities, long memberId) throws IOException {
         String accessToken = delegateAccessToken(email, authorities);
         String refreshToken = delegateRefreshToken(email);
 
-        String uri = createURI(accessToken, refreshToken).toString();
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("memberId", memberId);
+        body.put("accessToken", "Bearer "+ accessToken);
+        body.put("refreshToken", refreshToken);
+
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        String uri = createURI(memberId).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
@@ -78,10 +92,9 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return refreshToken;
     }
 
-    private URI createURI(String accessToken, String refreshToken) {
+    private URI createURI(long memberId) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("access_token", "Bearer "+ accessToken);
-        queryParams.add("refresh_token", refreshToken);
+        queryParams.add("memberId", String.valueOf(memberId));
 
         return UriComponentsBuilder
                 .newInstance()
