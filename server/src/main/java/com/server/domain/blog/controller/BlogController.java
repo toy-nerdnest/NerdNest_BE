@@ -141,29 +141,33 @@ public class BlogController {
     /* 멤버 개인 블로그 데이터 */
     @GetMapping("/blogs/member/{nickname}")
     public ResponseEntity getPersonalBlogData(@PathVariable("nickname") String nickname,
-                                              @RequestParam(required = false) Long categoryId,
+                                              @RequestParam(defaultValue = "0", required = false) Long categoryId,
                                               @RequestParam(defaultValue = "1", required = false) int page,
                                               @RequestParam(defaultValue = "8", required = false) int size) {
         log.info("categoryId = {}", categoryId);
         Member member = memberService.findMember(nickname);
 
-        Category singleCategoryById = categoryService.findSingleCategoryById(categoryId);
-
-        // categoryId 없으면 멤버가 작성한 모든 블로그 리턴
-        if (categoryId == null || singleCategoryById.getCategoryName().equals("전체")) {
-            Page<Blog> blogsByMemberNickname = blogService.findBlogsByMemberNickname(nickname, page, size);
-            return getMemberBlogResponseEntity(page, blogsByMemberNickname);
+        // categoryId가 0 이면 작성자 블로그 전체를 리턴
+        if (categoryId == 0 || categoryId == null) {
+            Page<Blog> allPageBlog
+                    = blogService.findBlogsByMemberNickname(nickname, page, size);
+                    
+            return getResponseEntity(page, allPageBlog);
         }
 
         // categoryId 있으면 해당 category에 대한 블로그 내역 리턴
-        Page<Blog> blogsByCategoryId = blogService.findBlogsByCategoryId(categoryId, page, size);
-        return getMemberBlogResponseEntity(page, blogsByCategoryId);
+        Page<Blog> blogsByCategoryId
+                = blogService.findBlogsByCategoryId(categoryId, page, size);
+
+        return getResponseEntity(page, blogsByCategoryId);
     }
 
     // 무한스크롤에 대한 isNextPage true false 여부 리스폰스 추가
-    private ResponseEntity getMemberBlogResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogsByCategoryId) {
-        boolean isNextPage = blogService.judgeNextPage(page, blogsByCategoryId);
-        List<Blog> blogs = blogsByCategoryId.getContent();
+    private ResponseEntity getResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogPages) {
+        int totalPages = blogPages.getTotalPages();
+        boolean isNextPage = blogService.judgeNextPage(page, totalPages);
+
+        List<Blog> blogs = blogPages.getContent();
         List<BlogResponseDto.Member> blogResponseMemberDtos = mapper.blogListToBlogResponseMemberDto(blogs);
 
         return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, blogResponseMemberDtos), HttpStatus.OK);
