@@ -2,6 +2,8 @@ package com.server.security.oauth.service;
 
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
+import com.server.exception.BusinessLogicException;
+import com.server.exception.ExceptionCode;
 import com.server.security.oauth.utils.OAuthAttributes;
 import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -45,9 +49,22 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private Member saveMember(OAuthAttributes attributes) {
 
-        Member member = memberRepository.findByEmail(attributes.getEmail())
-                .map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
-                .orElse(attributes.toEntity());
+        String email = attributes.getEmail();
+        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+
+        if(optionalMember.isPresent()) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+        }
+
+        String password = UUID.randomUUID().toString();
+
+        Member member = Member.builder()
+                .email(email)
+                .nickName(attributes.getName())
+                .profileImageUrl(attributes.getPicture())
+                .roles(authorityUtils.createRole())
+                .password(password)
+                .build();
 
         log.info("OAuth : 회원가입 성공");
 
