@@ -41,7 +41,7 @@ public class OAuthAttributes {
 
         return OAuthAttributes.builder()
                 .name(String.valueOf(kakaoProfile.get("nickname")))
-                .email(String.valueOf(kakaoProfile.get("email")))
+                .email(String.valueOf(kakaoAccount.get("email")))
                 .picture(String.valueOf(kakaoProfile.get("profile_image_url")))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
