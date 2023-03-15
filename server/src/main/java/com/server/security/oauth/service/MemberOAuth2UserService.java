@@ -9,6 +9,7 @@ import com.server.security.utils.MemberAuthorityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -28,6 +29,7 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     // 사용자의 정보를 기반으로 가입 및 정보 저장 기능을 한다.
     private final MemberRepository memberRepository;
     private final MemberAuthorityUtils authorityUtils;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,7 +40,7 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-        Member member = saveMember(attributes);
+        Member member = saveOrLoadMember(attributes);
 
         return new DefaultOAuth2User(Collections
                 .singletonList(new SimpleGrantedAuthority(authorityUtils.createAuthorities(member.getRoles()).toString())),
@@ -47,27 +49,16 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     }
 
-    private Member saveMember(OAuthAttributes attributes) {
+    private Member saveOrLoadMember(OAuthAttributes attributes) {
 
-        String email = attributes.getEmail();
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+        String password = passwordEncoder.encode(UUID.randomUUID().toString());
 
-        if(optionalMember.isPresent()) {
-            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
-        }
+        Member member = memberRepository.findByEmail(attributes.getEmail())
+                .map(entity -> entity.update(attributes.getName(), attributes.getPicture(), password))
+                .orElse(attributes.toEntity());
 
-        String password = UUID.randomUUID().toString();
+            log.info("OAuth : 회원가입 성공");
 
-        Member member = Member.builder()
-                .email(email)
-                .nickName(attributes.getName())
-                .profileImageUrl(attributes.getPicture())
-                .roles(authorityUtils.createRole())
-                .password(password)
-                .build();
-
-        log.info("OAuth : 회원가입 성공");
-
-        return memberRepository.save(member);
+            return memberRepository.save(member);
     }
 }
