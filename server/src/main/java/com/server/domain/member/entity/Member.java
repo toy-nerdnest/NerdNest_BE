@@ -41,10 +41,10 @@ public class Member extends Auditable {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    public Member update(String nickName, String profileImageUrl) {
+    public Member update(String nickName, String profileImageUrl, String password) {
         this.nickName = nickName;
         this.profileImageUrl = profileImageUrl;
-
+        this.password = password;
         return this;
     }
 
