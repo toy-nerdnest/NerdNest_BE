@@ -6,6 +6,7 @@ import com.server.domain.member.service.MemberService;
 import com.server.security.JwtTokenizer;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
+import com.server.security.utils.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,71 +36,74 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         var oAuth2User = (OAuth2User)authentication.getPrincipal();
-        // oauth2User 객체로부터 resource owner의 이메일 주소 가져오기
-        String email = String.valueOf(oAuth2User.getAttributes().get("email"));
+
+        String email = (String) oAuth2User.getAttributes().get("email");
+
+        log.info("google, oauthUser email : {}", email);
+
+        if(email == null) {
+            Map<Object, Object> kakaoAccount = (Map<Object, Object>) oAuth2User.getAttributes().get("kakao_account");
+            email = (String) kakaoAccount.get("email");
+            log.info("Kakao, oauthUser email : {}", email);
+        }
+
         List<String> authorities = authorityUtils.createRole();
 
         redirect(request, response, email, authorities);
         log.info("OAuth2 Login Success");
     }
 
+
     private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities) throws IOException {
-        String accessToken = delegateAccessToken(email, authorities);
-        String refreshToken = delegateRefreshToken(email);
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("email", email);
-        body.put("accessToken", "Bearer "+ accessToken);
-        body.put("refreshToken", refreshToken);
-
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getOutputStream(), body);
+//        String accessToken = delegateAccessToken(email, authorities);
+//        String refreshToken = delegateRefreshToken(email);
 
         String uri = createURI(email).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-    private String delegateAccessToken(String email, List<String> authorities) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", email);
-        claims.put("roles", authorities);
-
-        String subject = email;
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
-        return accessToken;
-    }
-
-    private String delegateRefreshToken(String email) {
-        String subject = email;
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
-
-        if(redisService.getRefreshToken(email)!=null) {
-            redisService.deleteRefreshToken(email);
-        }
-
-        redisService.saveRefreshToken(email, refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
-        log.info("save Refresh Token in redis server!");
-
-        return refreshToken;
-    }
+//    private String delegateAccessToken(String email, List<String> authorities) {
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("email", email);
+//        claims.put("roles", authorities);
+//
+//        String subject = email;
+//        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
+//        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+//
+//        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+//        return accessToken;
+//    }
+//
+//    private String delegateRefreshToken(String email) {
+//        String subject = email;
+//        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
+//        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+//
+//        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
+//
+//        if(redisService.getRefreshToken(email)!=null) {
+//            redisService.deleteRefreshToken(email);
+//        }
+//
+//        redisService.saveRefreshToken(email, refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
+//        log.info("save Refresh Token in redis server!");
+//
+//        return refreshToken;
+//    }
 
     private URI createURI(String email) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("email", email);
+//        queryParams.add("accessToken", "Bearer "+ accessToken);
+//        queryParams.add("refreshToken", refreshToken);
 
         return UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
-                .host("15.164.185.150")
-                .port(8080)
-                .path("oauth")
+                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
+//                .port(3000)
+                .path("oauth/login")
                 .queryParams(queryParams)
                 .build()
                 .toUri();

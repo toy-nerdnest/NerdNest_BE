@@ -40,15 +40,7 @@ public class AuthService {
         MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(email);
         String accessToken = delegateAccessToken(memberDetails);
 
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("memberId", memberDetails.getMemberId());
-        body.put("accessToken", "Bearer " + accessToken);
-        body.put("refreshToken", refreshToken);
-
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        new ObjectMapper().writeValue(response.getOutputStream(), body);
+        makeResponseBody(response, memberDetails.getMemberId(), accessToken, refreshToken);
     }
 
     public void logoutMember(HttpServletRequest request, HttpServletResponse response) {
@@ -71,7 +63,14 @@ public class AuthService {
         // key:token, value : logout
         redisService.saveAccessToken(accessToken, expiration);
 
+    }
 
+    public void oauthMember(HttpServletResponse response, String email) throws IOException {
+        MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(email);
+        String accessToken = delegateAccessToken(memberDetails);
+        String refreshToken = delegateRefreshToken(memberDetails);
+
+        makeResponseBody(response, memberDetails.getMemberId(), accessToken, refreshToken);
     }
 
     // accessToken 생성 로직
@@ -109,5 +108,18 @@ public class AuthService {
 
         String email = claims.getSubject();
         return email;
+    }
+
+    public void makeResponseBody(HttpServletResponse response, long memberId, String accessToken, String refreshToken) throws IOException {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("memberId", memberId);
+        body.put("accessToken", "Bearer " + accessToken);
+        body.put("refreshToken", refreshToken);
+
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        new ObjectMapper().writeValue(response.getOutputStream(), body);
     }
 }
