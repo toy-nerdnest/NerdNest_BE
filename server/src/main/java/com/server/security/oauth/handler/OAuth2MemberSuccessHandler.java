@@ -50,7 +50,6 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         log.info("OAuth2 Login Success");
     }
 
-
     private void redirect(HttpServletRequest request, HttpServletResponse response, String email, String path) throws IOException {
         String uri = createURI(email, path).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
@@ -65,7 +64,7 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 .scheme("http")
 //                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
                 .host("localhost")
-                .port(8080)
+                .port(3000)
                 .path(path)
                 .queryParams(queryParams)
                 .build()
