@@ -70,6 +70,8 @@ public class AuthService {
         String accessToken = delegateAccessToken(memberDetails);
         String refreshToken = delegateRefreshToken(memberDetails);
 
+        redisService.saveRefreshToken(email, refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
+
         makeResponseBody(response, memberDetails.getMemberId(), accessToken, refreshToken);
     }
 
