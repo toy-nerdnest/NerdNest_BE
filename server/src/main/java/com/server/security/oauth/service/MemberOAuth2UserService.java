@@ -1,5 +1,7 @@
 package com.server.security.oauth.service;
 
+import com.server.domain.category.entity.Category;
+import com.server.domain.category.repository.CategoryRepository;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.repository.MemberRepository;
 import com.server.exception.BusinessLogicException;
@@ -21,9 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -32,13 +32,15 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final MemberRepository memberRepository;
     private final MemberAuthorityUtils authorityUtils;
     private final PasswordEncoder passwordEncoder;
-
+    private final CategoryRepository categoryRepository;
     public MemberOAuth2UserService(MemberRepository memberRepository,
                                    MemberAuthorityUtils authorityUtils,
-                                   @Lazy PasswordEncoder passwordEncoder) {
+                                   @Lazy PasswordEncoder passwordEncoder,
+                                   CategoryRepository categoryRepository) {
         this.memberRepository = memberRepository;
         this.authorityUtils = authorityUtils;
         this.passwordEncoder = passwordEncoder;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -63,12 +65,31 @@ public class MemberOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         String password = passwordEncoder.encode(UUID.randomUUID().toString());
 
-        Member member = memberRepository.findByEmail(attributes.getEmail())
-                .map(entity -> entity.update(attributes.getName(), attributes.getPicture(), password))
-                .orElse(attributes.toEntity());
+        Optional<Member> optionalMember = memberRepository.findByEmail(attributes.getEmail());
 
-            log.info("OAuth : 회원가입 성공");
+        if(optionalMember.isPresent()) {
+           Member member = optionalMember
+                    .get()
+                    .update(attributes.getName(), attributes.getPicture(), password);
 
-            return memberRepository.save(member);
+           return memberRepository.save(member);
+        } else {
+            Member member = attributes.toEntity();
+            member.setPassword(password);
+
+            Member saveMember = memberRepository.save(member);
+
+            List<Category> categoryList = new ArrayList<>();
+            Category category = Category.builder()
+                    .categoryName("전체")
+                    .member(saveMember)
+                    .build();
+
+            categoryList.add(category);
+            categoryRepository.save(category);
+
+            saveMember.setCategories(categoryList);
+            return saveMember;
+        }
     }
 }
