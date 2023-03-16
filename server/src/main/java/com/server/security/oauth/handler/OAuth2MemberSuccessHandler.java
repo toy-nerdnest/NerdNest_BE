@@ -101,8 +101,9 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
-                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
-//                .port(3000)
+//                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
+                .host("localhost")
+                .port(3000)
                 .path("oauth/kakao/login")
                 .queryParams(queryParams)
                 .build()
