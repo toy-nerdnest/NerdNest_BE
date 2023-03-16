@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth
-                        .successHandler(new OAuth2MemberSuccessHandler(jwtTokenizer, authorityUtils, redisService)) // token 리다이렉트
+                        .successHandler(new OAuth2MemberSuccessHandler()) // token 리다이렉트
                         .userInfoEndpoint()
                         .userService(memberOAuth2UserService));
 

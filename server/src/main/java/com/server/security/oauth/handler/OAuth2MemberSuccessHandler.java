@@ -29,9 +29,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler { // oauth 인증 후, 프론트에게 jwt 전달 역할
-    private final JwtTokenizer jwtTokenizer;
-    private final MemberAuthorityUtils authorityUtils;
-    private final RedisService redisService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -40,71 +37,36 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         String email = (String) oAuth2User.getAttributes().get("email");
 
         log.info("google, oauthUser email : {}", email);
+        String path = "oauth/google/login";
 
         if(email == null) {
             Map<Object, Object> kakaoAccount = (Map<Object, Object>) oAuth2User.getAttributes().get("kakao_account");
             email = (String) kakaoAccount.get("email");
+            path = "oauth/kakao/login";
             log.info("Kakao, oauthUser email : {}", email);
         }
 
-        List<String> authorities = authorityUtils.createRole();
-
-        redirect(request, response, email, authorities);
+        redirect(request, response, email, path);
         log.info("OAuth2 Login Success");
     }
 
 
-    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<String> authorities) throws IOException {
-//        String accessToken = delegateAccessToken(email, authorities);
-//        String refreshToken = delegateRefreshToken(email);
-
-        String uri = createURI(email).toString();
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, String path) throws IOException {
+        String uri = createURI(email, path).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-//    private String delegateAccessToken(String email, List<String> authorities) {
-//        Map<String, Object> claims = new HashMap<>();
-//        claims.put("email", email);
-//        claims.put("roles", authorities);
-//
-//        String subject = email;
-//        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-//        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-//
-//        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
-//        return accessToken;
-//    }
-//
-//    private String delegateRefreshToken(String email) {
-//        String subject = email;
-//        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
-//        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-//
-//        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
-//
-//        if(redisService.getRefreshToken(email)!=null) {
-//            redisService.deleteRefreshToken(email);
-//        }
-//
-//        redisService.saveRefreshToken(email, refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
-//        log.info("save Refresh Token in redis server!");
-//
-//        return refreshToken;
-//    }
-
-    private URI createURI(String email) {
+    private URI createURI(String email, String path) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("email", email);
-//        queryParams.add("accessToken", "Bearer "+ accessToken);
-//        queryParams.add("refreshToken", refreshToken);
 
         return UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
 //                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
                 .host("localhost")
-                .port(3000)
-                .path("oauth/kakao/login")
+                .port(8080)
+                .path(path)
                 .queryParams(queryParams)
                 .build()
                 .toUri();
