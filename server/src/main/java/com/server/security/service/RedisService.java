@@ -2,6 +2,7 @@ package com.server.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,13 @@ public class RedisService {
     // refreshToken 저장
     public void saveRefreshToken(String email, String refreshToken, long expiration) {
         // redis-> key-value 타입 key: email, value : token, duration : 캐시에 데이터가 남아있는 시간
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(email, refreshToken, Duration.ofMinutes(expiration));
-        log.info("refresh token 만료 시간 : {} 분", Duration.ofMinutes(expiration));
+        try{
+            ValueOperations<String, String> values = redisTemplate.opsForValue();
+            values.set(email, refreshToken, Duration.ofMinutes(expiration));
+            log.info("refresh token 만료 시간 : {} 분", Duration.ofMinutes(expiration));
+        } catch (RedisConnectionFailureException e) {
+            log.error("Fail refresh token save in redis : {}", e.getMessage());
+        }
     }
 
     //logout - accessToken 저장
