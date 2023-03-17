@@ -21,7 +21,7 @@ public class Category extends Auditable {
 	@Column(name = "category_name")
 	private String categoryName;
 
-	@OneToMany(mappedBy = "category")
+	@OneToMany(mappedBy = "category", orphanRemoval = true)
 	private List<Blog> blogList;
 
 	@ManyToOne
