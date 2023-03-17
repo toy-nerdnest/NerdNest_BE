@@ -1,0 +1,75 @@
+spring:
+  main:
+    allow-circular-references: true
+  redis:
+    host: localhost
+    port: 6379
+
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  datasource:
+    url: jdbc:h2:mem:test;
+#  sql:
+#    init:
+#      mode: always
+#      data-locations: classpath*:db/h2/data.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: create # 설정확인 필수!
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${GOOGLE_OAUTH_ID}
+            clientSecret: ${GOOGLE_OAUTH_PW}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${KAKAO_OAUTH_ID}
+            client-secret: ${KAKAO_OAUTH_PW}
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization_uri: https://kauth.kakao.com/oauth/authorize
+            token_uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user_name_attribute: id
+  # S3 용량 제한
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# aws S3 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    s3:
+      bucket: ${S3_BUCKET}
+    region:
+      static: ${S3_REGION}
+    stack:
+      auto: false
+
+
+
