@@ -3,6 +3,8 @@ package com.server.security.oauth.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
+import com.server.exception.BusinessLogicException;
+import com.server.exception.ExceptionCode;
 import com.server.security.JwtTokenizer;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
@@ -62,9 +64,9 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         return UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
-//                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
-                .host("localhost")
-                .port(3000)
+                .host("nerdnest.s3-website.ap-northeast-2.amazonaws.com")
+//                .host("localhost")
+//                .port(8080)
                 .path(path)
                 .queryParams(queryParams)
                 .build()
