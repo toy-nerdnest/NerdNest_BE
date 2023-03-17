@@ -48,7 +48,7 @@ public class Member extends Auditable {
         return this;
     }
 
-    @OneToOne
+    @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
 
