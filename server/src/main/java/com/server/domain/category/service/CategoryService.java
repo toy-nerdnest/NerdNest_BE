@@ -85,11 +85,21 @@ public class CategoryService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CATEGORY_NOT_FOUND));
     }
 
-    public void verifyOwner(long categoryId, Member loginMember) {
-        Long loginMemberId = loginMember.getMemberId();
+    public Category verifyCategory(long categoryId, Member member) {
+        Member loginMember = memberService.findMember(member.getMemberId());
         Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
-        if (loginMemberId != ownerId) {
+
+        if (loginMember.getMemberId() != ownerId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
         }
+
+        Category baseCategory = member.getCategories().get(0);
+
+        if (baseCategory.getCategoryId() == categoryId) {
+            throw new BusinessLogicException(ExceptionCode.CATEGORY_ID_NOT_ALLOWED);
+        }
+
+        return baseCategory;
     }
+
 }

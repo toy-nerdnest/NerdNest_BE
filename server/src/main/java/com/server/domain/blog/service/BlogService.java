@@ -45,10 +45,16 @@ public class BlogService {
 
     public void editBlog(Blog blog) {
         Blog dbBlog = findBlogById(blog.getBlogId());
+
         beanUtils.copyNonNullProperties(blog, dbBlog);
 
         blogRepository.save(dbBlog);
     }
+
+    public void editBlog(Blog blog, Category baseCategory) {
+        blog.setCategory(baseCategory);
+    }
+
 
     public void plusBlogCount(Blog blog) {
         int commentCount = blog.getCommentCount();
