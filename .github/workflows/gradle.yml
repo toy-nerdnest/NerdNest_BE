@@ -12,7 +12,9 @@ env:
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: 
+    - main
+    - dev
 
 permissions:
   contents: read
