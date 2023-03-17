@@ -48,7 +48,7 @@ public class CategoryService {
         categoryRepository.save(singleCategory);
     }
 
-    public Category findSingleCategoryById(long categoryId) {
+    public Category findSingleCategoryById(Long categoryId) {
         return verifyCategoryById(categoryId);
     }
 
@@ -71,7 +71,11 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    private Category verifyCategoryById(long categoryId) {
+    private Category verifyCategoryById(Long categoryId) {
+        if (categoryId == 0 || categoryId == null) {
+            return new Category();
+        }
+
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CATEGORY_NOT_FOUND));
     }
