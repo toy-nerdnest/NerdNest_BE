@@ -13,6 +13,9 @@ import com.server.domain.category.service.CategoryService;
 import com.server.domain.comment.dto.CommentResponseDto;
 
 import com.server.domain.comment.service.CommentService;
+import com.server.domain.likes.dto.MyLikeBlogResponseDto;
+import com.server.domain.likes.entity.Likes;
+import com.server.domain.likes.mapper.LikeMapper;
 import com.server.domain.member.entity.Member;
 import com.server.domain.member.service.MemberService;
 import com.server.response.*;
@@ -37,6 +40,7 @@ import java.util.List;
 public class BlogController {
     private final BlogService blogService;
     private final BlogMapper mapper;
+    private final LikeMapper likeMapper;
     private final CategoryService categoryService;
     private final MemberService memberService;
     private final CommentService commentService;
@@ -137,8 +141,13 @@ public class BlogController {
 
         Member member = memberService.findMember(loginMember.getMemberId());
 
-        Page<Blog> blogPage = blogService.findBlogsByMemberWithLike(member, page, size);
-        return getHomeResponseEntity(page, blogPage);
+        Page<Likes> likesPage = blogService.findBlogsByMemberWithLike(member, page, size);
+        boolean isNextPage = blogService.judgeNextPage(page, likesPage);
+
+        List<Likes> likes = likesPage.getContent();
+        List<MyLikeBlogResponseDto> response = likeMapper.likesToMyLikeBlogResponseDtos(likes);
+
+        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, response), HttpStatus.OK);
     }
 
     private ResponseEntity getHomeResponseEntity(@RequestParam(defaultValue = "1", required = false) int page, Page<Blog> blogPage) {

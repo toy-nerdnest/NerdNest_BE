@@ -91,19 +91,12 @@ public class BlogService {
         return blogs;
     }
 
-    public Page<Blog> findBlogsByMemberWithLike(Member member, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
+    public Page<Likes> findBlogsByMemberWithLike(Member member, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("likeId").descending());
 
-        List<Likes> likes = likeRepository.findByMemberAndLikeStatus(member, com.server.domain.likes.entity.Likes.LikeStatus.LIKE);
+        Page<Likes> likes = likeRepository.findByMemberAndLikeStatus(member, Likes.LikeStatus.LIKE, pageable);
 
-        List<Blog> blogList = likes.stream()
-                        .map(like -> blogRepository.findById(like.getBlog().getBlogId()))
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-
-        Page<Blog> blogs = new PageImpl<>(blogList, pageable, blogList.size());
-
-        return blogs;
+        return likes;
     }
 
     public Page<Blog> findBlogsByMemberNickname(String nickname, int page, int size) {
@@ -140,7 +133,7 @@ public class BlogService {
         }
     }
 
-    public boolean judgeNextPage(int curPage, Page<Blog> blogPage) {
+    public boolean judgeNextPage(int curPage, Page<?> blogPage) {
         int totalPages = blogPage.getTotalPages();
         if (curPage > totalPages) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PAGE);
