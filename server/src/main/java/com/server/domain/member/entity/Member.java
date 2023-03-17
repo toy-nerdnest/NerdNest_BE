@@ -48,18 +48,18 @@ public class Member extends Auditable {
         return this;
     }
 
-    @OneToOne(orphanRemoval = true)
+    @OneToOne
     @JoinColumn(name = "image_file_id")
     private ImageFile imageFile;
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
     private List<Blog> blogs;
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Category> categories;
 
-    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
     private List<Likes> likes;
 

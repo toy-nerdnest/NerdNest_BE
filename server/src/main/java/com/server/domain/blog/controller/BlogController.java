@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -50,23 +51,33 @@ public class BlogController {
         }
 
         Member foundMember = memberService.findMember(loginMember.getMemberId());
+
+        if (blogPostDto.getCategoryId() == 0) {
+            Long categoryId = foundMember.getCategories().get(0).getCategoryId();
+            blogPostDto.setCategoryId(categoryId);
+        }
+
         Category category = categoryService.findSingleCategoryById(blogPostDto.getCategoryId());
         Blog blog = mapper.blogPostDtoToBlog(blogPostDto, category, foundMember);
         blogService.createBlog(blog);
+        String responseBlogId = makeBlogIdToJson(blog);
 
+        return new ResponseEntity<>(responseBlogId, HttpStatus.CREATED);
+    }
+
+    private static String makeBlogIdToJson(Blog blog) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("blogId", blog.getBlogId());
         String blogIdToJson
                 = gson.toJson(jsonObject);
-
-        return new ResponseEntity<>(blogIdToJson, HttpStatus.CREATED);
+        return blogIdToJson;
     }
 
     /* 블로그 수정 */
     @PatchMapping("/blogs/edit/{blog-id}")
     public ResponseEntity<HttpStatus> patchBlog(@RequestBody @Valid BlogDto.Patch blogPatchDto,
-                                                @PathVariable("blog-id") @Positive long blogId,
+                                                @PathVariable("blog-id") @Positive Long blogId,
                                                 @AuthenticationPrincipal Member loginMember) {
         if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
@@ -135,7 +146,7 @@ public class BlogController {
         List<Blog> blogs = blogPage.getContent();
         List<BlogResponseDto.Home> blogResponseHomeDto = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage,blogResponseHomeDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ScrollResponseDto<>(isNextPage, blogResponseHomeDto), HttpStatus.OK);
     }
 
     /* 멤버 개인 블로그 데이터 */
@@ -148,10 +159,10 @@ public class BlogController {
         Member member = memberService.findMember(nickname);
 
         // categoryId가 0 이면 작성자 블로그 전체를 리턴
-        if (categoryId == 0 || categoryId == null) {
+        if (categoryId == 0) {
             Page<Blog> allPageBlog
                     = blogService.findBlogsByMemberNickname(nickname, page, size);
-                    
+
             return getResponseEntity(page, allPageBlog);
         }
 
