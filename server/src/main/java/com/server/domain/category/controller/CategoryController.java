@@ -30,6 +30,7 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper mapper;
     private final MemberService memberService;
+
     @PostMapping("/category")
     public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
                                                          @AuthenticationPrincipal Member loginMember) {
@@ -40,7 +41,7 @@ public class CategoryController {
 
         Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, foundMember);
-        categoryService.makeSingleCategory(category);
+        categoryService.makeSingleCategory(category, foundMember);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -65,7 +66,7 @@ public class CategoryController {
 
     @GetMapping("/category")
     public ResponseEntity<?> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
-                                                             @RequestParam(required = false, defaultValue = "12") int size) {
+                                              @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Category> categoryPageInfo = categoryService.findAllCategories(page, size);
         List<Category> categories = categoryPageInfo.getContent();
         List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(categories);
@@ -89,13 +90,15 @@ public class CategoryController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Category baseCategory = categoryService.verifyCategory(categoryId, loginMember);
+        Member member = memberService.findMember(loginMember.getMemberId());
+        Category baseCategory = categoryService.verifyCategory(categoryId, member);
 
         Category categoryToDelete = categoryService.findSingleCategoryById(categoryId);
-        categoryToDelete.getBlogList().forEach(
-                blog -> blog.setCategory(baseCategory)
-        );
-
+        if (categoryToDelete.getBlogList() != null) {
+            categoryToDelete.getBlogList().forEach(
+                    blog -> blog.setCategory(baseCategory)
+            );
+        }
         categoryService.deleteSingleCategory(categoryToDelete.getCategoryId());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
