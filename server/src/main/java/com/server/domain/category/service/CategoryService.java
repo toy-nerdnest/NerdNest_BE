@@ -92,4 +92,12 @@ public class CategoryService {
         return baseCategory;
     }
 
+    public void verifyCategoryOwner(long categoryId, Member member) {
+        Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
+
+        if (member.getMemberId() != ownerId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
+        }
+    }
+
 }

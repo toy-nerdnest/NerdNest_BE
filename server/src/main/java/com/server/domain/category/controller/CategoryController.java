@@ -55,7 +55,7 @@ public class CategoryController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        categoryService.verifyCategory(categoryId, loginMember);
+        categoryService.verifyCategoryOwner(categoryId, loginMember);
         categoryDtoPatch.setCategoryId(categoryId);
         Category category = mapper.categoryDtoPatchToCategory(categoryDtoPatch);
         categoryService.editSingleCategory(category);
