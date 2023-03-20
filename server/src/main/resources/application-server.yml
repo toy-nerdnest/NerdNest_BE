@@ -12,7 +12,7 @@ spring:
     open-in-view: true
     show-sql: false
     hibernate:
-      ddl-auto: none # update 변경 필요
+      ddl-auto: create # update 변경 필요
     database: mysql
     properties:
       hibernate:
