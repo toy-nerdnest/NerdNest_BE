@@ -28,9 +28,9 @@ public class CategoryService {
 
     private final MemberService memberService;
 
-    public void makeSingleCategory(Category category, Member member) {
+    public Category makeSingleCategory(Category category, Member member) {
         verifyCategoryNameExistence(category, member);
-        categoryRepository.save(category);
+        return categoryRepository.save(category);
     }
 
     private void verifyCategoryNameExistence(Category category, Member member) {

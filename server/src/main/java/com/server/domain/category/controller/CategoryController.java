@@ -32,7 +32,7 @@ public class CategoryController {
     private final MemberService memberService;
 
     @PostMapping("/category")
-    public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
+    public ResponseEntity postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
                                                          @AuthenticationPrincipal Member loginMember) {
         if (loginMember == null) {
             log.error("loginMember is null : 허용되지 않은 접근입니다.");
@@ -41,9 +41,10 @@ public class CategoryController {
 
         Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, foundMember);
-        categoryService.makeSingleCategory(category, foundMember);
+        CategoryResponseDto response =
+                mapper.categoryToCategoryResponseDto(categoryService.makeSingleCategory(category, foundMember));
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @PatchMapping("/category/{category-id}")

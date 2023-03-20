@@ -33,4 +33,5 @@ public interface CategoryMapper {
                 }).collect(Collectors.toList()))
                 .build();
     }
+    CategoryResponseDto categoryToCategoryResponseDto(Category category);
 }
