@@ -1,12 +1,16 @@
 package com.server.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.server.domain.member.entity.Member;
+import com.server.exception.ExceptionCode;
+import com.server.response.ErrorResponse;
 import com.server.security.JwtTokenizer;
 import com.server.security.dto.LoginDto;
 import com.server.security.service.AuthService;
 import com.server.security.service.RedisService;
 import com.server.security.utils.MemberDetails;
+import io.lettuce.core.RedisConnectionException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -65,8 +69,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         if(redisService.getRefreshToken(member.getEmail())!=null) {
             redisService.deleteRefreshToken(member.getEmail());
         }
-        redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
-        log.info("save Refresh Token in redis server!");
+
+        try {
+            redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
+            log.info("save Refresh Token in redis server!");
+        } catch (RedisConnectionException re) {
+            log.info("RedisServerError : {}", re.getMessage());
+        }
+
         //token response body에 넣기
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("memberId", member.getMemberId());

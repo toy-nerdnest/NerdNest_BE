@@ -1,5 +1,6 @@
 package com.server.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
@@ -10,6 +11,7 @@ import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
 import com.server.security.utils.MemberDetails;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +83,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         String email = (String) claims.get("email");
         List<String> roles = (List<String>) claims.get("roles");
 
+        String refreshToken = redisService.getRefreshToken(email);
+
+        if(refreshToken == null) {
+            throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
+        }
+
+        validRefreshTokenExpiration(refreshToken);
+
         Member member = Member.builder()
                 .memberId(memberId)
                 .email(email)
@@ -103,6 +113,15 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         if(expiration <= 0) {
             log.info("Access Token 기간 만료!");
             throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+        }
+    }
+
+    private void validRefreshTokenExpiration(String jwt) {
+        long expiration = jwtTokenizer.getExpiration(jwt);
+
+        if(expiration <= 0) {
+            log.info("Refresh token 기간 만료!");
+            throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
         }
     }
 
