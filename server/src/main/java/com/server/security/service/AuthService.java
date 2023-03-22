@@ -7,6 +7,7 @@ import com.server.security.JwtTokenizer;
 import com.server.security.utils.MemberDetails;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthService {
     private final RedisService redisService;
@@ -53,14 +55,12 @@ public class AuthService {
 
         String email = getEmail(accessToken);
 
-        try {
-            redisService.deleteRefreshToken(email);
-        } catch (NullPointerException ne) {
-            throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
-        }
+        redisService.deleteRefreshToken(email);
+
         // access token 유효시간을 가져와서 redis 서버에 logout된 token으로 저장
         long expiration = jwtTokenizer.getExpiration(accessToken);
         // key:token, value : logout
+        log.info("logout 완료");
         redisService.saveAccessToken(accessToken, expiration);
 
     }
