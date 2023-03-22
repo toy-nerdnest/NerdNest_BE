@@ -112,6 +112,7 @@ public class BlogController {
                                                               @RequestParam(defaultValue = "1", required = false) int page,
                                                               @RequestParam(defaultValue = "12", required = false) int size) {
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
+
         return getHomeResponseEntity(page, blogsPageInfo);
     }
 
