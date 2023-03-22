@@ -46,12 +46,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
             setAuthenticationToContext(claims);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
-            sendErrorResponse(response, ee.getMessage());
-            return;
-        } catch (MalformedJwtException me) {
-            request.setAttribute("exception", me);
-            sendMalformedJwtException(response);
-            return;
         } catch (Exception e) {
             request.setAttribute("exception", e);
         }
@@ -70,9 +64,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         // request header에 들어온 accesstoken 검증
         String jws = request.getHeader("Authorization").replace("Bearer ", "");
 
-        if(StringUtils.hasText(request.getHeader("Refresh"))) {
-            validRefreshTokenExpiration(request.getHeader("Refresh"));
-        }
 
         if(StringUtils.hasText(redisService.getAccessToken(jws))) {
             throw new UnsupportedJwtException("로그아웃 된 토큰입니다.");
@@ -114,45 +105,5 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
             log.info("Access Token 기간 만료!");
             throw new ExpiredJwtException(null, null, "Authorization");
         }
-    }
-
-    private void validRefreshTokenExpiration(String jwt) throws IOException {
-        long expiration = jwtTokenizer.getExpiration(jwt);
-
-        if(expiration <= 0) {
-            log.info("Refresh Token 만료");
-            throw new ExpiredJwtException(null, null, "Refresh");
-        }
-    }
-
-    private HttpServletResponse sendErrorResponse(HttpServletResponse response, String message) throws IOException {
-
-        if (message.equals("Authorization")) {
-            Gson gson = new Gson();
-            ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
-
-            return response;
-        } else {
-            Gson gson = new Gson();
-            ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
-
-            return response;
-        }
-    }
-
-    private HttpServletResponse sendMalformedJwtException(HttpServletResponse response) throws IOException {
-        Gson gson = new Gson();
-        ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
-
-        return response;
     }
 }

@@ -1,9 +1,7 @@
 package com.server.config;
 
 import com.server.security.JwtTokenizer;
-import com.server.security.filter.JwtAuthenticationFilter;
-import com.server.security.filter.JwtVerificationFilter;
-import com.server.security.filter.MemberAuthenticationEntryPoint;
+import com.server.security.filter.*;
 import com.server.security.handler.MemberAccessDeniedHandler;
 import com.server.security.handler.MemberAuthenticationFailureHandler;
 import com.server.security.handler.MemberAuthenticationSuccessHandler;
@@ -104,9 +102,13 @@ public class SecurityConfig {
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
+            JwtReissueFilter jwtReissueFilter = new JwtReissueFilter(jwtTokenizer);
+            JwtLogoutFilter jwtLogoutFilter = new JwtLogoutFilter(jwtTokenizer, redisService);
 
             builder.addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
-                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
+                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class)
+                    .addFilterAfter(jwtReissueFilter, JwtVerificationFilter.class)
+                    .addFilterAfter(jwtLogoutFilter, JwtVerificationFilter.class);
         }
     }
 }
