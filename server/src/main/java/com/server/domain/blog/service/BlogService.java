@@ -133,13 +133,19 @@ public class BlogService {
 
     public boolean judgeNextPage(int curPage, Page<?> blogPage) {
         int totalPages = blogPage.getTotalPages();
-        if (curPage > totalPages) {
+
+        if (curPage == 1 && totalPages == 0) {
+            return false;
+        }
+
+        if (curPage != 1 && totalPages != 0 && curPage > totalPages) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PAGE);
         }
 
         if (curPage == totalPages) {
             return false;
         }
+
         return true;
     }
 
