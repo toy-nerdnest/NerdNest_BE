@@ -73,8 +73,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             redisService.saveRefreshToken(member.getEmail(), refreshToken, jwtTokenizer.getRefreshTokenExpirationMinutes());
             log.info("save Refresh Token in redis server!");
-        } catch (RedisConnectionException re) {
-            log.info("RedisServerError : {}", re.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         //token response body에 넣기
