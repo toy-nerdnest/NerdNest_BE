@@ -232,4 +232,15 @@ public class BlogController {
 
         return new ResponseEntity<>(new SearchResponseDto<>(isNextPage, responses, totalElements), HttpStatus.OK);
     }
+
+    /* 블로그 기록 데이터 - 레코드 */
+    @GetMapping("/records/{member-id}")
+    public ResponseEntity<?> getBlogRecordData(@PathVariable("member-id") @Positive Long memberId,
+                                               @RequestParam int year) {
+        memberService.findMember(memberId);
+        List<Blog> allBlogByYear = blogService.findAllBlogByMemberAndYearIn(memberId, year);
+        List<BlogResponseDto.Record> records = mapper.blogListToBlogResponseRecordDto(allBlogByYear);
+
+        return new ResponseEntity<>(new ListResponseDto.BlogRecord<>(records), HttpStatus.OK);
+    }
 }

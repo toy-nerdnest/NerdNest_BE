@@ -9,4 +9,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ListResponseDto<T>  {
     private List<T> blogList;
+
+    @Getter
+    @AllArgsConstructor
+    public static class BlogRecord<T> {
+        private List<T> blogRecord;
+    }
 }

@@ -1,6 +1,7 @@
 package com.server.domain.blog.service;
 
 import com.server.domain.blog.entity.Blog;
+import com.server.domain.blog.repository.BlogCustomRepositoryImpl;
 import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class BlogService {
     private final BlogRepository blogRepository;
+    private final BlogCustomRepositoryImpl blogCustomRepository;
     private final CustomBeanUtils beanUtils;
     private final CategoryService categoryService;
     private final MemberService memberService;
@@ -79,6 +81,10 @@ public class BlogService {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sort).descending());
 
         return blogRepository.findAll(pageable);
+    }
+
+    public List<Blog> findAllBlogByMemberAndYearIn(Long memberId, int year) {
+        return blogCustomRepository.findBlogByMemberIdAndYearIn(memberId, year);
     }
 
     public Page<Blog> findBlogsByCategoryId(long categoryId, int page, int size) {

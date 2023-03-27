@@ -60,4 +60,10 @@ public class BlogResponseDto {
         private List<CommentResponseDto> commentList;
     }
 
+    @Builder
+    @Data
+    public static class Record {
+        private Long blogId;
+        private int blogRecord;
+    }
 }
