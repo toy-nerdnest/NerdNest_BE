@@ -1,6 +1,5 @@
 package com.server.domain.blog.repository;
 
-
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.domain.blog.entity.Blog;
 import com.server.domain.blog.entity.QBlog;
