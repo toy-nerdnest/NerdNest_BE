@@ -46,6 +46,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
             setAuthenticationToContext(claims);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
+            sendErrorResponse(response);
+            return;
         } catch (Exception e) {
             request.setAttribute("exception", e);
         }
@@ -105,5 +107,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
             log.info("Access Token 기간 만료!");
             throw new ExpiredJwtException(null, null, "Authorization");
         }
+    }
+    private HttpServletResponse sendErrorResponse(HttpServletResponse response) throws IOException {
+        Gson gson = new Gson();
+        ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
+
+        return response;
     }
 }
