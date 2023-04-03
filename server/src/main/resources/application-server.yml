@@ -36,7 +36,7 @@ spring:
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_PW}
-            redirect-uri: http://15.164.185.150:8080/login/oauth2/code/kakao
+            redirect-uri: http://54.180.152.110:8080/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope:
