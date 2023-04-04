@@ -26,6 +26,7 @@ spring:
   security:
     oauth2:
       client:
+        useCurrentUri: false
         registration:
           google:
             clientId: ${GOOGLE_OAUTH_ID}
