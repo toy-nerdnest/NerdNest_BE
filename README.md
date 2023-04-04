@@ -1,8 +1,10 @@
 <h2>🙇‍♂️ Intro 🙇‍</h2>
-
+- 배포주소: http://nerdnest.s3-website.ap-northeast-2.amazonaws.com</br>
+- API 명세서 : https://vigorous-scooter-ec8.notion.site/API-f5862a76ccb64fc3aadf4e05119af778
+- 
 <h2>🙆🏻 팀원소개 🙆🏻</h2>
 
-|임경인 (팀장, FE) |정세민(FE)
+<!-- |임경인 (팀장, FE) |정세민(FE)
 :-----------------------------:|:-----------------------------:|
 |<img src='https://user-images.githubusercontent.com/99936345/228133608-5f4159f3-8640-4a60-8afc-eba7b609a9b6.png' width='150' height='160'>|<img src='https://user-images.githubusercontent.com/99936345/228134159-9e017459-b183-4429-afaf-a49f55e8e55f.png' width='150' height='160'/>
 |<a href="https://velog.io/@limdumb"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/limdumb"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a>        |<a href="https://velog.io/@alsgood4007"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/MINSE97"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a>
@@ -10,7 +12,16 @@
 |나혜리 (BE) |이동우 (BE)
 :-----------------------------:|:-----------------------------:|
 |<img src='https://user-images.githubusercontent.com/99936345/228133782-6025ac93-5abf-4657-a41d-17e881588242.png' width='150'>|<img src='https://user-images.githubusercontent.com/99936345/228133696-27a2dfd8-bb41-49b2-b777-330bbd6a5722.png' width='150'/>|>|                  
-|<a href="https://velog.io/@hiy7030"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/hiy7030"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> |<a href="https://blog.naver.com/east_meet"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/eastmeet"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> |
+|<a href="https://velog.io/@hiy7030"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/hiy7030"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> |<a href="https://blog.naver.com/east_meet"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/eastmeet"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> | -->
+
+|임경인 (팀장, FE) |정세민(FE) |나혜리 (BE) |이동우 (BE)
+:-----------------------------:|:-----------------------------:|:-----------------------------:|:-----------------------------:|
+|<img src='https://user-images.githubusercontent.com/99936345/228133608-5f4159f3-8640-4a60-8afc-eba7b609a9b6.png' width='150' height='160'>|<img src='https://user-images.githubusercontent.com/99936345/228134159-9e017459-b183-4429-afaf-a49f55e8e55f.png' width='150' height='160'/>|<img src='https://user-images.githubusercontent.com/99936345/228133782-6025ac93-5abf-4657-a41d-17e881588242.png' width='150'>|<img src='https://user-images.githubusercontent.com/99936345/228133696-27a2dfd8-bb41-49b2-b777-330bbd6a5722.png' width='150'/>|>|           
+|<a href="https://velog.io/@limdumb"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/limdumb"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a>        |<a href="https://velog.io/@alsgood4007"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/MINSE97"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a>|<a href="https://velog.io/@hiy7030"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/hiy7030"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> |<a href="https://blog.naver.com/east_meet"><img src="https://img.shields.io/badge/Velog-3DDC84?style=flat-square&logo=Blogger&logoColor=white"/></a> <a href="https://github.com/eastmeet"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/></a> |
+
+
+
+
 
 ## :crown: Roles & Responsibility
 
@@ -25,5 +36,5 @@
 
 ![undefined (1)](https://user-images.githubusercontent.com/107395229/228468198-5f4dc56e-e974-4c3f-b4af-0777beb74d88.png)
 
-
-
+<h2>⛓️ ERD ⛓️</h2>
+<img src=https://user-images.githubusercontent.com/110949256/229836427-e6327dd0-e0f4-48f3-9ca8-c9ec93766ad4.png>
