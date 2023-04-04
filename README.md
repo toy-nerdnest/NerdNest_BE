@@ -1,7 +1,7 @@
 <h2>🙇‍♂️ Intro 🙇‍</h2>
-- 배포주소: http://nerdnest.s3-website.ap-northeast-2.amazonaws.com</br>
-- API 명세서 : https://vigorous-scooter-ec8.notion.site/API-f5862a76ccb64fc3aadf4e05119af778
-- 
+<h3><a href=http://nerdnest.s3-website.ap-northeast-2.amazonaws.com>배포주소</a></br></h3>
+<h3><a href=https://vigorous-scooter-ec8.notion.site/API-f5862a76ccb64fc3aadf4e05119af778>API 명세서</a></h3>
+
 <h2>🙆🏻 팀원소개 🙆🏻</h2>
 
 <!-- |임경인 (팀장, FE) |정세민(FE)
@@ -23,7 +23,7 @@
 
 
 
-## :crown: Roles & Responsibility
+## :crown: Roles & Responsibility :crown:
 
 | Name | Roles  | Responsibility |
 :---------------------------------:|:--------------------------------:|--------------------------------|
