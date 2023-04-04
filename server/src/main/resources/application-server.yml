@@ -34,7 +34,7 @@ spring:
             scope:
               - email
               - profile
-            redirect-uri: http://ec2-54-180-152-110.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
+            preEstablishedRedirectUri: http://ec2-54-180-152-110.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_PW}
