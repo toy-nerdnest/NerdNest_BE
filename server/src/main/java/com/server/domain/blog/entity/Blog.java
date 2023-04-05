@@ -25,6 +25,7 @@ public class Blog extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long blogId;
 
+
     @Column(name = "blog_title", length = 30, nullable = false)
     private String blogTitle;
 

@@ -56,4 +56,13 @@ public interface BlogMapper {
     @Mapping(target = "commentList", source = "commentResponseDtos")
     BlogResponseDto.Detail blogListToBlogDetailResponseDtoWithComment(Blog blog, List<CommentResponseDto> commentResponseDtos);
 
+    /* 블로그 기록 데이터 */
+    default List<BlogResponseDto.Record> blogListToBlogResponseRecordDto(List<Blog> blogs){
+        return blogs.stream().map(blog -> {
+            return BlogResponseDto.Record.builder()
+                    .blogId(blog.getBlogId())
+                    .blogRecord(blog.getCreatedAt().getDayOfYear())
+                    .build();
+        }).collect(Collectors.toList());
+    }
 }

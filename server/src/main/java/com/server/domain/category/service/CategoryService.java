@@ -28,13 +28,13 @@ public class CategoryService {
 
     private final MemberService memberService;
 
-    public void makeSingleCategory(Category category) {
-        verifyCategoryNameExistence(category);
-        categoryRepository.save(category);
+    public Category makeSingleCategory(Category category, Member member) {
+        verifyCategoryNameExistence(category, member);
+        return categoryRepository.save(category);
     }
 
-    private void verifyCategoryNameExistence(Category category) {
-        Optional<Category> optionalCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+    private void verifyCategoryNameExistence(Category category, Member member) {
+        Optional<Category> optionalCategory = categoryRepository.findByCategoryNameAndMember(category.getCategoryName(), member);
 
         if (optionalCategory.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.CATEGORY_EXISTS);
@@ -50,10 +50,6 @@ public class CategoryService {
 
     public Category findSingleCategoryById(Long categoryId) {
         return verifyCategoryById(categoryId);
-    }
-
-    public Category findSingleCategoryByName(String categoryName) {
-        return verifyCategoryByName(categoryName);
     }
 
     public List<Category> findAllCategoriesEachMember(@Positive long memberId) {
@@ -80,16 +76,28 @@ public class CategoryService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CATEGORY_NOT_FOUND));
     }
 
-    private Category verifyCategoryByName(String categoryName) {
-        return categoryRepository.findByCategoryName(categoryName)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.CATEGORY_NOT_FOUND));
+    public Category verifyCategory(long categoryId, Member member) {
+        Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
+
+        if (member.getMemberId() != ownerId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
+        }
+
+        Category baseCategory = member.getCategories().get(0);
+
+        if (baseCategory.getCategoryId() == categoryId) {
+            throw new BusinessLogicException(ExceptionCode.CATEGORY_ID_NOT_ALLOWED);
+        }
+
+        return baseCategory;
     }
 
-    public void verifyOwner(long categoryId, Member loginMember) {
-        Long loginMemberId = loginMember.getMemberId();
+    public void verifyCategoryOwner(long categoryId, Member member) {
         Long ownerId = findSingleCategoryById(categoryId).getMember().getMemberId();
-        if (loginMemberId != ownerId) {
+
+        if (member.getMemberId() != ownerId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_NOT_AUTHORIZED);
         }
     }
+
 }

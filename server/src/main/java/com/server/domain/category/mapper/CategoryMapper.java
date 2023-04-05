@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CategoryMapper {
+
     Category categoryDtoPostToCategory(CategoryDto.Post categoryDtoPost, Member member);
 
     Category categoryDtoPatchToCategory(CategoryDto.Patch categoryDtoPatch);
@@ -32,4 +33,5 @@ public interface CategoryMapper {
                 }).collect(Collectors.toList()))
                 .build();
     }
+    CategoryResponseDto categoryToCategoryResponseDto(Category category);
 }

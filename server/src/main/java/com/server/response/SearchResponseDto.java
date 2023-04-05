@@ -5,14 +5,10 @@ import lombok.Getter;
 
 import java.util.List;
 
-@Getter
 @AllArgsConstructor
-public class ListResponseDto<T>  {
+@Getter
+public class SearchResponseDto<T> {
+    private boolean nextPage;
     private List<T> blogList;
-
-    @Getter
-    @AllArgsConstructor
-    public static class BlogRecord<T> {
-        private List<T> blogRecord;
-    }
+    private long totalElements;
 }

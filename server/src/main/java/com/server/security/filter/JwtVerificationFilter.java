@@ -1,5 +1,6 @@
 package com.server.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.server.domain.member.entity.Member;
 import com.server.exception.BusinessLogicException;
@@ -10,6 +11,7 @@ import com.server.security.service.RedisService;
 import com.server.security.utils.MemberAuthorityUtils;
 import com.server.security.utils.MemberDetails;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +46,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
             setAuthenticationToContext(claims);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
-            sendErrorResponse(response);
-            log.info("기간이 만료된 토큰입니다.");
+            sendErrorResponse(response, ee.getMessage());
+            return;
         } catch (Exception e) {
             request.setAttribute("exception", e);
         }
@@ -60,9 +62,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
         return authorization == null || !authorization.startsWith("Bearer");
     }
     // token 인증
-    private Map<String, Object> verifyJws(HttpServletRequest request) {
+    private Map<String, Object> verifyJws(HttpServletRequest request) throws IOException {
         // request header에 들어온 accesstoken 검증
         String jws = request.getHeader("Authorization").replace("Bearer ", "");
+
 
         if(StringUtils.hasText(redisService.getAccessToken(jws))) {
             throw new UnsupportedJwtException("로그아웃 된 토큰입니다.");
@@ -72,6 +75,12 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
 
         String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
         Map<String, Object> claims = jwtTokenizer.getClaims(jws, base64EncodedSecretKey).getBody();
+        String email = (String) claims.get("email");
+        String refreshToken = redisService.getRefreshToken(email);
+
+        if(refreshToken == null) {
+            throw new ExpiredJwtException(null, null, "Refresh");
+        }
 
         return claims;
     }
@@ -102,15 +111,27 @@ public class JwtVerificationFilter extends OncePerRequestFilter { // jwt 검증 
 
         if(expiration <= 0) {
             log.info("Access Token 기간 만료!");
-            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+            throw new ExpiredJwtException(null, null, "Authorization");
         }
     }
 
-    private void sendErrorResponse(HttpServletResponse response) throws IOException {
-        Gson gson = new Gson();
-        ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
+    private HttpServletResponse sendErrorResponse(HttpServletResponse response, String message) throws IOException {
+        if(message.equals("Authorization")) {
+            Gson gson = new Gson();
+            ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.ACCESS_TOKEN_EXPIRATION);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
+
+            return response;
+        } else {
+            Gson gson = new Gson();
+            ErrorResponse errorResponse = ErrorResponse.of(ExceptionCode.REFRESH_TOKEN_EXPIRATION);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(gson.toJson(errorResponse, ErrorResponse.class));
+
+            return response;
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    Optional<Category> findByCategoryName(String categoryName);
+    Optional<Category> findByCategoryNameAndMember(String categoryName, Member member);
     List<Category> findAllByMember(Member member);
     Page<Category> findAll(Pageable pageable);
 }

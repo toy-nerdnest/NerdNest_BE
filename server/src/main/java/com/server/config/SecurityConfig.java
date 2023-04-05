@@ -1,9 +1,7 @@
 package com.server.config;
 
 import com.server.security.JwtTokenizer;
-import com.server.security.filter.JwtAuthenticationFilter;
-import com.server.security.filter.JwtVerificationFilter;
-import com.server.security.filter.MemberAuthenticationEntryPoint;
+import com.server.security.filter.*;
 import com.server.security.handler.MemberAccessDeniedHandler;
 import com.server.security.handler.MemberAuthenticationFailureHandler;
 import com.server.security.handler.MemberAuthenticationSuccessHandler;
@@ -28,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -76,8 +75,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-//        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://15.164.185.150:8080", "http://nerdnest.s3-website.ap-northeast-2.amazonaws.com" ));
-        corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://15.164.185.150:8080", "http://nerdnest.s3-website.ap-northeast-2.amazonaws.com"));
+//        corsConfiguration.addAllowedOriginPattern("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setExposedHeaders(Arrays.asList("Authorization", "Refresh"));
@@ -103,10 +102,13 @@ public class SecurityConfig {
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, authorityUtils, redisService);
+            JwtReissueFilter jwtReissueFilter = new JwtReissueFilter(jwtTokenizer);
+            JwtLogoutFilter jwtLogoutFilter = new JwtLogoutFilter(jwtTokenizer, redisService);
 
-            builder.addFilter(jwtAuthenticationFilter) // 인증 시도 필터
-                    .addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
-                    .addFilterAfter(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class); // 토큰 검증 필터
+            builder.addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
+                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class)
+                    .addFilterAfter(jwtReissueFilter, JwtVerificationFilter.class)
+                    .addFilterAfter(jwtLogoutFilter, JwtVerificationFilter.class);
         }
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -33,39 +32,51 @@ public class CategoryController {
     private final MemberService memberService;
 
     @PostMapping("/category")
-    public ResponseEntity<HttpStatus> postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
+    public ResponseEntity postSingleCategory(@RequestBody @Valid CategoryDto.Post categoryDtoPost,
                                                          @AuthenticationPrincipal Member loginMember) {
+        if (loginMember == null) {
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         Member foundMember = memberService.findMember(loginMember.getMemberId());
         Category category = mapper.categoryDtoPostToCategory(categoryDtoPost, foundMember);
-        categoryService.makeSingleCategory(category);
+        CategoryResponseDto response =
+                mapper.categoryToCategoryResponseDto(categoryService.makeSingleCategory(category, foundMember));
 
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @PatchMapping("/category/{category-id}")
     public ResponseEntity<HttpStatus> patchSingleCategory(@RequestBody CategoryDto.Patch categoryDtoPatch,
-                                                          @PathVariable("category-id") @Min(value = 2) long categoryId,
+                                                          @PathVariable("category-id") long categoryId,
                                                           @AuthenticationPrincipal Member loginMember) {
-        categoryService.verifyOwner(categoryId, loginMember);
+        if (loginMember == null) {
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        categoryService.verifyCategoryOwner(categoryId, loginMember);
         categoryDtoPatch.setCategoryId(categoryId);
         Category category = mapper.categoryDtoPatchToCategory(categoryDtoPatch);
         categoryService.editSingleCategory(category);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
     @GetMapping("/category")
-    public ResponseEntity<MultiResponseDto> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
-                                                             @RequestParam(required = false, defaultValue = "12") int size) {
+    public ResponseEntity<?> getAllCategories(@RequestParam(required = false, defaultValue = "1") int page,
+                                              @RequestParam(required = false, defaultValue = "12") int size) {
         Page<Category> categoryPageInfo = categoryService.findAllCategories(page, size);
         List<Category> categories = categoryPageInfo.getContent();
         List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(categories);
 
-        return new ResponseEntity(new MultiResponseDto.CategoryList<>(categoryResponseDtos, categoryPageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto.CategoryList<>(categoryResponseDtos, categoryPageInfo), HttpStatus.OK);
     }
 
     @GetMapping("/category/{member-id}")
-    public ResponseEntity<SingleResponseDto.Category> getAllCategoriesEachMember(@PathVariable("member-id") @Positive long memberId) {
+    public ResponseEntity<?> getAllCategoriesEachMember(@PathVariable("member-id") @Positive long memberId) {
         List<Category> allCategoriesEachMember = categoryService.findAllCategoriesEachMember(memberId);
         List<CategoryResponseDto> categoryResponseDtos = mapper.categoriesToCategoryResponseDto(allCategoriesEachMember);
 
@@ -73,11 +84,24 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{category-id}")
-    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") @Min(value = 2) long categoryId,
+    public ResponseEntity<HttpStatus> deleteSingleCategory(@PathVariable("category-id") long categoryId,
                                                            @AuthenticationPrincipal Member loginMember) {
-        categoryService.verifyOwner(categoryId, loginMember);
-        categoryService.deleteSingleCategory(categoryId);
+        if (loginMember == null) {
+            log.error("loginMember is null : 허용되지 않은 접근입니다.");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        Member member = memberService.findMember(loginMember.getMemberId());
+        Category baseCategory = categoryService.verifyCategory(categoryId, member);
+
+        Category categoryToDelete = categoryService.findSingleCategoryById(categoryId);
+        if (categoryToDelete.getBlogList() != null) {
+            categoryToDelete.getBlogList().forEach(
+                    blog -> blog.setCategory(baseCategory)
+            );
+        }
+        categoryService.deleteSingleCategory(categoryToDelete.getCategoryId());
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

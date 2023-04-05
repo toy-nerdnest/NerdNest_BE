@@ -1,6 +1,7 @@
 package com.server.domain.blog.service;
 
 import com.server.domain.blog.entity.Blog;
+import com.server.domain.blog.repository.BlogCustomRepositoryImpl;
 import com.server.domain.blog.repository.BlogRepository;
 import com.server.domain.category.entity.Category;
 import com.server.domain.category.service.CategoryService;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class BlogService {
     private final BlogRepository blogRepository;
+    private final BlogCustomRepositoryImpl blogCustomRepository;
     private final CustomBeanUtils beanUtils;
     private final CategoryService categoryService;
     private final MemberService memberService;
@@ -45,10 +47,16 @@ public class BlogService {
 
     public void editBlog(Blog blog) {
         Blog dbBlog = findBlogById(blog.getBlogId());
+
         beanUtils.copyNonNullProperties(blog, dbBlog);
 
         blogRepository.save(dbBlog);
     }
+
+    public void editBlog(Blog blog, Category baseCategory) {
+        blog.setCategory(baseCategory);
+    }
+
 
     public void plusBlogCount(Blog blog) {
         int commentCount = blog.getCommentCount();
@@ -75,12 +83,8 @@ public class BlogService {
         return blogRepository.findAll(pageable);
     }
 
-    public Page<Blog> findBlogsByCategoryName(String categoryName, int page, int size) {
-        Category singleCategory = categoryService.findSingleCategoryByName(categoryName);
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("blogId").descending());
-        Page<Blog> blogs = blogRepository.findAllByCategory(singleCategory, pageable);
-
-        return blogs;
+    public List<Blog> findAllBlogByMemberAndYearIn(Long memberId, int year) {
+        return blogCustomRepository.findBlogByMemberIdAndYearIn(memberId, year);
     }
 
     public Page<Blog> findBlogsByCategoryId(long categoryId, int page, int size) {
@@ -135,13 +139,19 @@ public class BlogService {
 
     public boolean judgeNextPage(int curPage, Page<?> blogPage) {
         int totalPages = blogPage.getTotalPages();
-        if (curPage > totalPages) {
+
+        if (curPage == 1 && totalPages == 0) {
+            return false;
+        }
+
+        if (curPage != 1 && totalPages != 0 && curPage > totalPages) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PAGE);
         }
 
         if (curPage == totalPages) {
             return false;
         }
+
         return true;
     }
 

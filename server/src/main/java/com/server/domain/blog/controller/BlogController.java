@@ -112,6 +112,7 @@ public class BlogController {
                                                               @RequestParam(defaultValue = "1", required = false) int page,
                                                               @RequestParam(defaultValue = "12", required = false) int size) {
         Page<Blog> blogsPageInfo = blogService.findAllBlog(switchTabToSort(tab), page, size);
+
         return getHomeResponseEntity(page, blogsPageInfo);
     }
 
@@ -224,10 +225,22 @@ public class BlogController {
                                      @RequestParam(defaultValue = "1", required = false) int page,
                                      @RequestParam(defaultValue = "12", required = false) int size) {
         Page<Blog> pageBlogs = blogService.searchBlog(keyword, page, size);
+        long totalElements = pageBlogs.getTotalElements();
         boolean isNextPage = blogService.judgeNextPage(page, pageBlogs);
         List<Blog> blogs = pageBlogs.getContent();
         List<BlogResponseDto.Home> responses = mapper.blogListToBlogResponseHomeDto(blogs);
 
-        return new ResponseEntity<>(new ScrollResponseDto(isNextPage, responses), HttpStatus.OK);
+        return new ResponseEntity<>(new SearchResponseDto<>(isNextPage, responses, totalElements), HttpStatus.OK);
+    }
+
+    /* 블로그 기록 데이터 - 레코드 */
+    @GetMapping("/records/{member-id}")
+    public ResponseEntity<?> getBlogRecordData(@PathVariable("member-id") @Positive Long memberId,
+                                               @RequestParam int year) {
+        memberService.findMember(memberId);
+        List<Blog> allBlogByYear = blogService.findAllBlogByMemberAndYearIn(memberId, year);
+        List<BlogResponseDto.Record> records = mapper.blogListToBlogResponseRecordDto(allBlogByYear);
+
+        return new ResponseEntity<>(new ListResponseDto.BlogRecord<>(records), HttpStatus.OK);
     }
 }
