@@ -26,6 +26,7 @@ spring:
   security:
     oauth2:
       client:
+        useCurrentUri: false
         registration:
           google:
             clientId: ${GOOGLE_OAUTH_ID}
@@ -33,10 +34,11 @@ spring:
             scope:
               - email
               - profile
+            redirect_uri: http://ec2-15-164-185-150.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_PW}
-            redirect-uri: http://54.180.152.110:8080/login/oauth2/code/kakao
+            redirect-uri: http://15.164.185.150:8080/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope:
