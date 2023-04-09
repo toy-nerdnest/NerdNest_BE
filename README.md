@@ -1,5 +1,26 @@
 <h2>🙇‍♂️ Intro 🙇‍</h2>
-<h3><a href=http://nerdnest.s3-website.ap-northeast-2.amazonaws.com>배포주소</a></br></h3>
+
+![image](https://user-images.githubusercontent.com/107395229/230752176-767143d8-f073-4f48-8d3b-bedd80fc165a.png)
+<br>
+1일 1커밋처럼 블로그도 <b>1일 1블로깅</b>을 기록하고 결과를 시각적으로 나타난다면 어떨까? 
+<br>더 즐거운 블로깅을 할 수 있지 않을까? 
+<br><br>
+기술 블로그를 작성하는 모든 이들의 블로그, **NerdNest**입니다. <br>
+**NerdNest**는 **매일 새로운 글쓰기를 독려하기 위한 기능**을 제공합니다! <br>
+글을 작성함과 동시에 나의 블로그에 나타나는 **레코드 로그**를 확인하세요!<br>
+1년 단위로 내가 작성한 기록들을 살펴볼 수 있습니다! <br>
+![image](https://user-images.githubusercontent.com/107395229/230753839-3de546f6-0d53-4dee-bfe8-435687ec946d.png)<br>
+
+1일 1블로깅의 **성취감**을 느끼고 싶다면 **NerdNest**와 함께하세요! <br>
+
+## 🗓️ 프로젝트 기간
+23.02 ~ 23.03
+
+## 🔗 배포 링크 
+<h3><a href=http://nerdnest.s3-website.ap-northeast-2.amazonaws.com>NerdNest</a></br></h3>
+
+## 📖API 명세서
+
 <h3><a href=https://vigorous-scooter-ec8.notion.site/API-f5862a76ccb64fc3aadf4e05119af778>API 명세서</a></h3>
 
 <h2>🙆🏻 팀원소개 🙆🏻</h2>
