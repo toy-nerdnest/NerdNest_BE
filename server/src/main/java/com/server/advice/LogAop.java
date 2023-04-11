@@ -36,12 +36,14 @@ public class LogAop {
         String method = getMethod(joinPoint);
         log.info("=========Method name : {}=========", method);
 
+
         if(returnObj == null) {
             log.info("return parameter is null");
         } else {
             log.info("return parameter type : {}", returnObj.getClass().getSimpleName());
             log.info("return parameter value : {}", returnObj);
         }
+
     }
 
     private String getMethod(JoinPoint joinPoint) {
