@@ -10,7 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 @Aspect
-@Component
+//@Component
 @Slf4j
 public class LogAop {
     // 적용할 곳
